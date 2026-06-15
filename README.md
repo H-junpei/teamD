@@ -1,2 +1,2 @@
 # teamD
-I love kusumoto
+I love kusumoto&Yano
