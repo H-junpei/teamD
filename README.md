@@ -1,1 +1,2 @@
 # teamD
+I love kusumoto
