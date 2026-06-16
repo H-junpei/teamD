@@ -12,13 +12,13 @@ Set-Location $rootDir
 # ----------------------------
 $hasPython = $null -ne (Get-Command python -ErrorAction SilentlyContinue)
 $hasNode = $null -ne (Get-Command node -ErrorAction SilentlyContinue)
-$hasNpmCmd = $null -ne (Get-Command npm.cmd -ErrorAction SilentlyContinue)
+$hasNpm = $null -ne (Get-Command npm -ErrorAction SilentlyContinue)
 
 if (-not $hasPython) {
     Write-Host "[warn] python が見つかりません。backend を使う場合は Python のインストールが必要です。"
 }
 
-if (-not $hasNode -or -not $hasNpmCmd) {
+if (-not $hasNode -or -not $hasNpm) {
     Write-Host "[warn] Node.js / npm が見つかりません。frontend を使う場合は Node.js LTS のインストールが必要です。"
     Write-Host "[warn] https://nodejs.org/ja/download"
 }
@@ -73,15 +73,15 @@ if (Test-Path ".\frontend") {
     Write-Host "[frontend] setup start"
     Set-Location ".\frontend"
 
-    if (-not $hasNode -or -not $hasNpmCmd) {
+    if (-not $hasNode -or -not $hasNpm) {
         Write-Host "[frontend] Node.js / npm が見つからないため skip"
     } else {
         if (Test-Path ".\package-lock.json") {
-            Write-Host "[frontend] npm.cmd ci"
-            npm.cmd ci
+            Write-Host "[frontend] npm ci"
+            npm ci
         } elseif (Test-Path ".\package.json") {
-            Write-Host "[frontend] package-lock.json not found, fallback to npm.cmd install"
-            npm.cmd install
+            Write-Host "[frontend] package-lock.json not found, fallback to npm install"
+            npm install
         } else {
             Write-Host "[frontend] package.json not found, skip"
         }
