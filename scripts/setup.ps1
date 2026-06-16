@@ -2,14 +2,12 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "=== Setup start ==="
 
-# このスクリプトの1つ上（teamD）へ移動
+# 階層移動
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $rootDir = Split-Path -Parent $scriptDir
 Set-Location $rootDir
 
-# ----------------------------
 # backend (Python / Flask)
-# ----------------------------
 if (Test-Path ".\backend") {
     Write-Host "[backend] setup start"
     Set-Location ".\backend"
@@ -39,9 +37,7 @@ if (Test-Path ".\backend") {
     Write-Host "[backend] folder not found, skip"
 }
 
-# ----------------------------
-# frontend (React / Vite)
-# ----------------------------
+# frontend (React)
 if (Test-Path ".\frontend") {
     Write-Host "[frontend] setup start"
     Set-Location ".\frontend"
