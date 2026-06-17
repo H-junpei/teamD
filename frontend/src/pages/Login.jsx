@@ -1,56 +1,44 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [name, setName] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (isAdmin) {
-      // 管理者ページへ
       navigate("/admin");
     } else {
       if (!name) {
         alert("名前を入力してください");
         return;
       }
-      // 求職者ページへ
+
+      // ★ 名前を保存（簡易的にlocalStorage）
+      localStorage.setItem("user_name", name);
+
       navigate("/user");
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>ログイン</h1>
+    <div>
+      <h2>ログイン</h2>
 
-      {/* 切り替えボタン */}
-      <div style={{ marginBottom: "20px" }}>
-        <button onClick={() => setIsAdmin(true)}>管理者</button>
-        <button onClick={() => setIsAdmin(false)}>求職者</button>
-      </div>
+      <button onClick={() => setIsAdmin(true)}>管理者</button>
+      <button onClick={() => setIsAdmin(false)}>求職者</button>
 
-      {/* 管理者ログイン */}
-      {isAdmin ? (
-        <div>
-          <input type="text" placeholder="ID" />
-          <br />
-          <input type="password" placeholder="パスワード" />
-        </div>
-      ) : (
-        <div>
-          <input
-            type="text"
-            placeholder="名前を入力"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <br />
-          <input type="email" placeholder="メールアドレス" />
-        </div>
+      {!isAdmin && (
+        <input
+          type="text"
+          placeholder="名前"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       )}
 
-      <br />
       <button onClick={handleLogin}>ログイン</button>
     </div>
   );
