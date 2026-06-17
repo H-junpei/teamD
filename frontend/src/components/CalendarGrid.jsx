@@ -1,25 +1,36 @@
-import TimeSlot from "./TimeSlot";
-
 const times = Array.from({ length: 24 }, (_, i) => {
   const hour = 8 + Math.floor(i / 2);
   const min = i % 2 === 0 ? "00" : "30";
-  return `${hour}:${min}`;
+  return `${String(hour).padStart(2, "0")}:${min}`;
 });
 
-const days = ["月", "火", "水", "木", "金", "土", "日"];
+const CalendarGrid = ({ slots, days, onClickSlot }) => {
 
-const CalendarGrid = ({ slots, onClickSlot, isAdmin }) => {
+  // ✅ 一致チェック
   const findSlot = (day, time) => {
-    return slots.find((s) => s.day === day && s.time === time);
+
+    const result = slots.find((s) => {
+      const match = String(s.day) === String(day)
+                 && String(s.time) === String(time);
+
+      if (match) {
+        console.log("③ 一致した:", s); // ★デバッグ③
+      }
+
+      return match;
+    });
+
+    return result;
   };
 
   return (
     <div>
+
       {/* ヘッダー */}
-      <div style={{ display: "grid", gridTemplateColumns: "80px repeat(7, 1fr)" }}>
-        <div></div>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "80px" }} />
         {days.map((d) => (
-          <div key={d} style={{ textAlign: "center", fontWeight: "bold" }}>
+          <div key={d} style={{ width: "100px" }}>
             {d}
           </div>
         ))}
@@ -27,23 +38,32 @@ const CalendarGrid = ({ slots, onClickSlot, isAdmin }) => {
 
       {/* 本体 */}
       {times.map((time) => (
-        <div
-          key={time}
-          style={{ display: "grid", gridTemplateColumns: "80px repeat(7, 1fr)" }}
-        >
-          <div>{time}</div>
+        <div key={time} style={{ display: "flex" }}>
+          <div style={{ width: "80px" }}>{time}</div>
+
           {days.map((day) => {
             const slot = findSlot(day, time);
 
             return (
-              <TimeSlot
+              <div
                 key={day + time}
-                slot={slot}
-                day={day}
-                time={time}
-                onClick={onClickSlot}
-                isAdmin={isAdmin}
-              />
+                onClick={() => {
+                  console.log("② クリック:", day, time, slot); // ★デバッグ②
+                  onClickSlot(day, time, slot);
+                }}
+                style={{
+                  width: "100px",
+                  height: "40px",
+                  border: "1px solid #ccc",
+                  cursor: "pointer",
+                  backgroundColor: slot
+                    ? slot.status === "available"
+                      ? "#90ee90"
+                      : "#f08080"
+                    : "#f5f5f5"
+                }}
+              >
+              </div>
             );
           })}
         </div>
