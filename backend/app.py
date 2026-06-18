@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # DB
 from extensions import db
@@ -55,6 +55,9 @@ def create_app():
     # =========================
     # スロット追加（クリック）
     # =========================
+    # =========================
+    # スロット追加（クリック）
+    # =========================
     @app.route("/api/admin/slots", methods=["POST"])
     def add_slot():
         data = request.json
@@ -64,25 +67,27 @@ def create_app():
             "%Y-%m-%d %H:%M"
         )
 
-        # ✅ 重複防止（重要）
+        # 重複防止
         exists = TimeSlot.query.filter_by(start_datetime=dt).first()
         if exists:
             return jsonify({"message": "既に存在"}), 400
 
+        end_dt = dt + timedelta(minutes=30)
+
         new_slot = TimeSlot(
-            admin_id=1,  # 仮
+            admin_id=1,
             start_datetime=dt,
-            end_datetime=dt,
+            end_datetime=end_dt,
             status="available"
         )
 
         db.session.add(new_slot)
         db.session.commit()
 
-        print("✅ 追加:", data)
+        print("開始:", dt)
+        print("終了:", end_dt)
 
         return jsonify({"message": "追加完了"})
-
     # =========================
     # スロット削除（トグル）
     # =========================
