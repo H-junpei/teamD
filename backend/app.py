@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timedelta
 from datetime import datetime
 from werkzeug.security import generate_password_hash
+from routes.admin_routes import admin_bp
 
 # DB
 from extensions import db
@@ -28,6 +29,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    app.register_blueprint(admin_bp)
 
     # =========================
     # 確認
