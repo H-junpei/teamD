@@ -5,6 +5,8 @@ from extensions import db
 from models import Admin, TimeSlot, Reservation, JobSeeker
 from flask_sqlalchemy import SQLAlchemy
 
+from flask_cors import CORS
+from routes.auth import auth_bp
 
 load_dotenv()
 
@@ -14,6 +16,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 
 # Flaskアプリ(app)とDB(SQLAlchemy)を接続する
 db.init_app(app)
+
+CORS(app)
+app.register_blueprint(auth_bp)
+
 
 with app.app_context():
     db.create_all()
