@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 const Login = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [name, setName] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleAdminClick = () => {
+    setIsAdmin(true);
+    navigate("/admin");
+  };
+
+  const handleUserClick = () => {
+    setIsAdmin(false);
+  };
+
+  const handleLogin = () => {
     if (isAdmin) {
       navigate("/admin");
     } else {
@@ -16,9 +24,7 @@ const Login = () => {
         return;
       }
 
-      // ★ 名前を保存（簡易的にlocalStorage）
       localStorage.setItem("user_name", name);
-
       navigate("/user");
     }
   };
@@ -27,8 +33,8 @@ const Login = () => {
     <div>
       <h2>ログイン</h2>
 
-      <button onClick={() => setIsAdmin(true)}>管理者</button>
-      <button onClick={() => setIsAdmin(false)}>求職者</button>
+      <button onClick={handleAdminClick}>管理者</button>
+      <button onClick={handleUserClick}>求職者</button>
 
       {!isAdmin && (
         <input
@@ -39,7 +45,9 @@ const Login = () => {
         />
       )}
 
-      <button onClick={handleLogin}>ログイン</button>
+      {!isAdmin && (
+        <button onClick={handleLogin}>ログイン</button>
+      )}
     </div>
   );
 };
