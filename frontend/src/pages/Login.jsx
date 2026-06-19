@@ -58,6 +58,8 @@ const Login = () => {
       if (data.role === "admin") {
         navigate("/admin");
       } else if (data.role === "user") {
+        // 必要なら名前を保存
+        localStorage.setItem("user_name", name);
         navigate("/user");
       } else {
         alert("ログイン結果が正しく返ってきませんでした");
@@ -69,8 +71,8 @@ const Login = () => {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>ログイン</h1>
+    <div>
+      <h2>ログイン</h2>
 
       <div style={{ marginBottom: "20px" }}>
         <button onClick={() => setIsAdmin(true)}>管理者</button>

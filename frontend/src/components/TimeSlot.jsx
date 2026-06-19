@@ -6,8 +6,8 @@ const TimeSlot = ({ slot, day, time, onClick, isAdmin }) => {
   };
 
   const getColor = () => {
-    if (status === "available") return "#4caf50";
-    if (status === "reserved") return "#9c27b0";
+    if (status === "available") return "#008cff";
+    if (status === "reserved") return "#ffa600";
     return "#eee";
   };
 
