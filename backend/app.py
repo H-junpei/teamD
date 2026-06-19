@@ -2,8 +2,6 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
-from datetime import datetime
-from werkzeug.security import generate_password_hash
 from routes.admin_routes import admin_bp
 
 # DB
@@ -12,7 +10,7 @@ from models import TimeSlot, Admin
 
 # CORS
 from flask_cors import CORS
-
+from routes.auth import auth_bp
 
 def create_app():
     load_dotenv()
@@ -28,8 +26,14 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+
     db.init_app(app)
     app.register_blueprint(admin_bp)
+
+    app.register_blueprint(auth_bp)
+
+    with app.app_context():
+        db.create_all()
 
     # =========================
     # 確認
