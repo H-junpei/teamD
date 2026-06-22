@@ -1,8 +1,10 @@
 from flask import Flaskfrom_dotenv
 
 import os
+from datetime import datetime, timedelta
 
 from extensions import db
+from models import TimeSlot
 
 from routes.slot import slot_bp
 from routes.admin import admin_bp
@@ -30,6 +32,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    app.register_blueprint(admin_bp)
 
     # Blueprint登録
     app.register_blueprint(slot_bp)
