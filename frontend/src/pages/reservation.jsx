@@ -4,7 +4,7 @@ import CalendarGrid from "../components/CalendarGrid";
 
 const API_BASE = "http://127.0.0.1:5000";
 
-const Yoyaku = () => {
+const reservation = () => {
   const [slots, setSlots] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [message, setMessage] = useState("");
@@ -127,4 +127,4 @@ const Yoyaku = () => {
   );
 };
 
-export default Yoyaku;
+export default reservation;
