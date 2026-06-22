@@ -36,7 +36,6 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
-    app.register_blueprint(admin_bp)
     app.register_blueprint(jobseeker_bp)
 
     # Blueprint登録
