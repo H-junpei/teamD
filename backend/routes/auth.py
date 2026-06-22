@@ -54,7 +54,7 @@ def login():
     # -------------------------
     # 求職者ログイン
     # -------------------------
-    elif role == "user":
+    elif role == "jobseeker":
         name = data.get("name")
         email = data.get("email")
 
@@ -74,7 +74,7 @@ def login():
 
         return jsonify({
             "success": True,
-            "role": "user",
+            "role": "jobseeker",
             "message": "求職者ログイン成功"
         })
 
