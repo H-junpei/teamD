@@ -6,6 +6,9 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminPage from "./pages/AdminPage";
 import UserPage from "./pages/UserPage";
 import reservation from "./pages/reservation";
+import JobSeekerRegister from "./pages/JobSeekerRegister";
+import JobSeekerSelect from "./pages/JobSeekerSelect";
+import JobSeekerLogin from "./pages/JobSeekerLogin";
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
         <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/page" element={<AdminPage />} />
+        <Route path="/jobseeker" element={<JobSeekerSelect />} />
+        <Route path="/jobseeker/register" element={<JobSeekerRegister />} />
+        <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/reservation" element={<reservation />} />
       </Routes>
