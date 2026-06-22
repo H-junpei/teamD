@@ -8,7 +8,9 @@ from routes.admin_routes import admin_bp
 from routes.job_seeker_routes import jobseeker_bp
 
 from extensions import db
-from models import TimeSlot
+
+from models import TimeSlot, Admin, Reservation, JobSeeker, AdminJobSeeker
+
 
 from routes.slot import slot_bp
 from routes.admin import admin_slots_bp
