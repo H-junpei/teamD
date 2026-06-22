@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./AdminCalendarV2.css";
 import CalendarEvent from "./CalendarEvent";
 
@@ -17,17 +16,8 @@ const AdminCalendarV2 = ({
   onEventClick,
   onCreateSlot,
 }) => {
-  const [isDragging, setIsDragging] =
-    useState(false);
-
-  const [dragStart, setDragStart] =
-    useState(null);
-
-  const [dragEnd, setDragEnd] =
-    useState(null);
-
   // =========================
-  // 今週生成
+  // 今週の日付生成
   // =========================
 
   const getWeekDays = () => {
@@ -52,66 +42,7 @@ const AdminCalendarV2 = ({
   const weekDays = getWeekDays();
 
   // =========================
-  // ドラッグ開始
-  // =========================
-
-  const handleMouseDown = (
-    day,
-    time
-  ) => {
-    setIsDragging(true);
-
-    setDragStart({
-      day,
-      time,
-    });
-
-    setDragEnd({
-      day,
-      time,
-    });
-  };
-
-  // =========================
-  // ドラッグ中
-  // =========================
-
-  const handleMouseEnter = (
-    day,
-    time
-  ) => {
-    if (!isDragging) return;
-
-    setDragEnd({
-      day,
-      time,
-    });
-  };
-
-  // =========================
-  // ドラッグ終了
-  // =========================
-
-  const handleMouseUp = () => {
-    if (!dragStart || !dragEnd) {
-      setIsDragging(false);
-      return;
-    }
-
-    onCreateSlot?.(
-      dragStart.day,
-      dragStart.time,
-      dragEnd.day,
-      dragEnd.time
-    );
-
-    setIsDragging(false);
-    setDragStart(null);
-    setDragEnd(null);
-  };
-
-  // =========================
-  // イベント位置
+  // イベント位置計算
   // =========================
 
   const calcTop = (start) => {
@@ -128,7 +59,7 @@ const AdminCalendarV2 = ({
     const endDate = new Date(end);
 
     return (
-      (endDate - startDate) /
+      (endDate.getTime() - startDate.getTime()) /
       1000 /
       60
     );
@@ -186,7 +117,7 @@ const AdminCalendarV2 = ({
           ))}
         </div>
 
-        {/* 日ごとの列 */}
+        {/* 日付列 */}
 
         {weekDays.map((day) => {
           const dayEvents = events.filter(
@@ -201,52 +132,39 @@ const AdminCalendarV2 = ({
               key={day.dateString}
               className="day-column"
             >
-              {/* グリッド */}
+              {/* 30分ブロック */}
 
               {TIMES.map((time) => (
                 <div
                   key={time}
                   className="hour-row"
-                  onMouseDown={() =>
-                    handleMouseDown(
+                  onClick={() =>
+                    onCreateSlot?.(
                       day.dateString,
                       time
                     )
-                  }
-                  onMouseEnter={() =>
-                    handleMouseEnter(
-                      day.dateString,
-                      time
-                    )
-                  }
-                  onMouseUp={
-                    handleMouseUp
                   }
                 />
               ))}
 
               {/* イベント */}
 
-              {dayEvents.map(
-                (event) => (
-                  <CalendarEvent
-                    key={event.id}
-                    event={event}
-                    onClick={
-                      onEventClick
-                    }
-                    style={{
-                      top: `${calcTop(
-                        event.start
-                      )}px`,
-                      height: `${calcHeight(
-                        event.start,
-                        event.end
-                      )}px`,
-                    }}
-                  />
-                )
-              )}
+              {dayEvents.map((event) => (
+                <CalendarEvent
+                  key={event.id}
+                  event={event}
+                  onClick={onEventClick}
+                  style={{
+                    top: `${calcTop(
+                      event.start
+                    )}px`,
+                    height: `${calcHeight(
+                      event.start,
+                      event.end
+                    )}px`,
+                  }}
+                />
+              ))}
             </div>
           );
         })}

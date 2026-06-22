@@ -11,9 +11,9 @@ from models import (
 admin_bp = Blueprint("admin", __name__)
 
 
-# ==========================================
+# ==================================
 # 管理者カレンダー表示用
-# ==========================================
+# ==================================
 @admin_bp.route("/api/admin/events", methods=["GET"])
 def get_admin_events():
 
@@ -27,12 +27,17 @@ def get_admin_events():
             time_slot_id=slot.time_slot_id
         ).first()
 
-        job_seeker = None
+        job_seeker_name = None
+        email = None
 
         if reservation:
-            job_seeker = JobSeeker.query.get(
+            seeker = JobSeeker.query.get(
                 reservation.job_seeker_id
             )
+
+            if seeker:
+                job_seeker_name = seeker.name
+                email = seeker.email
 
         title = "空き枠"
 
@@ -46,16 +51,8 @@ def get_admin_events():
             "id": slot.time_slot_id,
             "title": title,
             "status": slot.status,
-            "jobSeeker": (
-                job_seeker.name
-                if job_seeker
-                else None
-            ),
-            "email": (
-                job_seeker.email
-                if job_seeker
-                else None
-            ),
+            "jobSeeker": job_seeker_name,
+            "email": email,
             "start": slot.start_datetime.isoformat(),
             "end": slot.end_datetime.isoformat(),
         })
@@ -63,64 +60,48 @@ def get_admin_events():
     return jsonify(events)
 
 
-# ==========================================
-# 空き枠作成
-# AdminCalendarV2対応
-# ==========================================
-@admin_bp.route(
-    "/api/admin/slots",
-    methods=["POST"]
-)
+# ==================================
+# 空き枠追加（30分固定）
+# ==================================
+@admin_bp.route("/api/admin/slots", methods=["POST"])
 def add_slot():
 
     data = request.json
 
     start_dt = datetime.strptime(
-        f"{data['start_day']} {data['start_time']}",
+        f"{data['day']} {data['time']}",
         "%Y-%m-%d %H:%M"
     )
 
-    end_dt = datetime.strptime(
-        f"{data['end_day']} {data['end_time']}",
-        "%Y-%m-%d %H:%M"
-    )
-
-    # クリックのみの場合
-    if start_dt == end_dt:
-        end_dt = start_dt + timedelta(minutes=30)
-
-    # ドラッグ方向補正
-    if end_dt < start_dt:
-        start_dt, end_dt = end_dt, start_dt
-
-    exists = TimeSlot.query.filter(
-        TimeSlot.start_datetime < end_dt,
-        TimeSlot.end_datetime > start_dt
+    exists = TimeSlot.query.filter_by(
+        start_datetime=start_dt
     ).first()
 
     if exists:
         return jsonify({
-            "message": "時間帯が重複しています"
+            "message": "既に存在します"
         }), 400
 
-    slot = TimeSlot(
+    end_dt = start_dt + timedelta(minutes=30)
+
+    new_slot = TimeSlot(
         admin_id=1,
         start_datetime=start_dt,
         end_datetime=end_dt,
         status="available"
     )
 
-    db.session.add(slot)
+    db.session.add(new_slot)
     db.session.commit()
 
     return jsonify({
-        "message": "登録完了"
+        "message": "追加完了"
     })
 
 
-# ==========================================
+# ==================================
 # 空き枠削除
-# ==========================================
+# ==================================
 @admin_bp.route(
     "/api/admin/slots/<int:slot_id>",
     methods=["DELETE"]
@@ -142,9 +123,9 @@ def delete_slot(slot_id):
     })
 
 
-# ==========================================
+# ==================================
 # 予約承認
-# ==========================================
+# ==================================
 @admin_bp.route(
     "/api/admin/approve/<int:slot_id>",
     methods=["POST"]
@@ -177,9 +158,9 @@ def approve_reservation(slot_id):
     })
 
 
-# ==========================================
+# ==================================
 # 予約却下
-# ==========================================
+# ==================================
 @admin_bp.route(
     "/api/admin/reject/<int:slot_id>",
     methods=["POST"]

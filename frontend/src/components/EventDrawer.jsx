@@ -7,15 +7,17 @@ const EventDrawer = ({
   onApprove,
   onReject,
 }) => {
-  if (!isOpen || !event) return null;
+  if (!isOpen || !event) {
+    return null;
+  }
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
 
     return date.toLocaleString("ja-JP", {
       year: "numeric",
-      month: "numeric",
-      day: "numeric",
+      month: "2-digit",
+      day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -46,7 +48,7 @@ const EventDrawer = ({
 
       <div className="event-drawer">
         <div className="drawer-header">
-          <h2>面接詳細</h2>
+          <h2>予定詳細</h2>
 
           <button
             className="close-button"
@@ -99,7 +101,7 @@ const EventDrawer = ({
 
           <div className="info-section">
             <div className="label">
-              開始
+              開始日時
             </div>
 
             <div className="value">
@@ -109,25 +111,13 @@ const EventDrawer = ({
 
           <div className="info-section">
             <div className="label">
-              終了
+              終了日時
             </div>
 
             <div className="value">
               {formatDateTime(event.end)}
             </div>
           </div>
-
-          {event.memo && (
-            <div className="info-section">
-              <div className="label">
-                備考
-              </div>
-
-              <div className="value">
-                {event.memo}
-              </div>
-            </div>
-          )}
         </div>
 
         {event.status === "pending" && (
@@ -135,7 +125,7 @@ const EventDrawer = ({
             <button
               className="approve-button"
               onClick={() =>
-                onApprove(event.id)
+                onApprove?.(event.id)
               }
             >
               承認
@@ -144,7 +134,7 @@ const EventDrawer = ({
             <button
               className="reject-button"
               onClick={() =>
-                onReject(event.id)
+                onReject?.(event.id)
               }
             >
               却下

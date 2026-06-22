@@ -6,16 +6,8 @@ import EventDrawer from "../components/EventDrawer";
 
 const AdminPage = () => {
   const [events, setEvents] = useState([]);
-
-  const [selectedEvent, setSelectedEvent] =
-    useState(null);
-
-  const [isDrawerOpen, setIsDrawerOpen] =
-    useState(false);
-
-  // =========================
-  // イベント取得
-  // =========================
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const fetchEvents = async () => {
     try {
@@ -25,10 +17,7 @@ const AdminPage = () => {
 
       setEvents(res.data);
     } catch (error) {
-      console.error(
-        "イベント取得失敗",
-        error
-      );
+      console.error(error);
     }
   };
 
@@ -36,55 +25,31 @@ const AdminPage = () => {
     fetchEvents();
   }, []);
 
-  // =========================
-  // イベントクリック
-  // =========================
-
-  const handleEventClick = (event) => {
-    setSelectedEvent(event);
-    setIsDrawerOpen(true);
-  };
-
-  // =========================
-  // Drawer閉じる
-  // =========================
-
-  const handleCloseDrawer = () => {
-    setSelectedEvent(null);
-    setIsDrawerOpen(false);
-  };
-
-  // =========================
-  // 空き枠作成
-  // =========================
-
-  const handleCreateSlot = async (
-    startDay,
-    startTime,
-    endDay,
-    endTime
-  ) => {
+  const handleCreateSlot = async (day, time) => {
     try {
       await axios.post(
         "http://127.0.0.1:5000/api/admin/slots",
         {
-          start_day: startDay,
-          start_time: startTime,
-          end_day: endDay,
-          end_time: endTime,
+          day,
+          time,
         }
       );
 
       fetchEvents();
     } catch (error) {
       console.error(error);
-      alert("空き枠登録に失敗しました");
     }
   };
 
-  // =========================
-  // 承認
-  // =========================
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setSelectedEvent(null);
+    setIsDrawerOpen(false);
+  };
 
   const handleApprove = async (slotId) => {
     try {
@@ -92,20 +57,12 @@ const AdminPage = () => {
         `http://127.0.0.1:5000/api/admin/approve/${slotId}`
       );
 
-      await fetchEvents();
-
+      fetchEvents();
       handleCloseDrawer();
-
-      alert("予約を承認しました");
     } catch (error) {
       console.error(error);
-      alert("承認に失敗しました");
     }
   };
-
-  // =========================
-  // 却下
-  // =========================
 
   const handleReject = async (slotId) => {
     try {
@@ -113,14 +70,10 @@ const AdminPage = () => {
         `http://127.0.0.1:5000/api/admin/reject/${slotId}`
       );
 
-      await fetchEvents();
-
+      fetchEvents();
       handleCloseDrawer();
-
-      alert("予約を却下しました");
     } catch (error) {
       console.error(error);
-      alert("却下に失敗しました");
     }
   };
 
@@ -128,17 +81,11 @@ const AdminPage = () => {
     <div
       style={{
         padding: "20px",
-        backgroundColor: "#f5f7fa",
         minHeight: "100vh",
+        backgroundColor: "#f5f7fa",
       }}
     >
-      <h1
-        style={{
-          marginBottom: "20px",
-        }}
-      >
-        面接スケジュール管理
-      </h1>
+      <h1>面接スケジュール管理</h1>
 
       <AdminCalendarV2
         events={events}
