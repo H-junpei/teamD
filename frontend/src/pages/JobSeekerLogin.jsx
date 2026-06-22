@@ -33,7 +33,7 @@ const JobSeekerLogin = () => {
       console.log("バックエンドからの返答:", data);
 
       if (data.role === "jobseeker") {
-        navigate("/user");
+        navigate("/reservation");
       } else {
         alert("ログイン結果が正しく返ってきませんでした");
       }
