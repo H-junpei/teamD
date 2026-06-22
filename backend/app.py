@@ -4,9 +4,13 @@ from flask_cors import CORS
 
 import os
 from datetime import datetime, timedelta
+from routes.admin_routes import admin_bp
+from routes.job_seeker_routes import jobseeker_bp
 
 from extensions import db
-from models import TimeSlot
+
+from models import TimeSlot, Admin, Reservation, JobSeeker, AdminJobSeeker
+
 
 from routes.slot import slot_bp
 from routes.admin import admin_slots_bp
@@ -35,6 +39,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    app.register_blueprint(jobseeker_bp)
 
     # Blueprint登録
     app.register_blueprint(slot_bp)

@@ -13,6 +13,12 @@ class Admin (db.Model):
   password_hash = db.Column(db.String(255), nullable=False)
   
   time_slots = db.relationship("TimeSlot", backref="admin")
+
+  job_seeker_links = db.relationship(
+    "AdminJobSeeker",
+    backref="admin",
+    cascade="all, delete-orphan"
+  )
     
 # 空き時間テーブル
 class TimeSlot(db.Model):
@@ -60,3 +66,40 @@ class JobSeeker(db.Model):
   email = db.Column(db.String(50), nullable=False)
   
   reservations = db.relationship("Reservation", backref="job_seeker")
+
+  admin_links = db.relationship(
+    "AdminJobSeeker",
+    backref="job_seeker",
+    cascade="all, delete-orphan"
+  )
+
+
+# 管理者と求職者の紐づけテーブル
+class AdminJobSeeker(db.Model):
+  __tablename__ = "admin_job_seekers"
+
+  admin_job_seeker_id = db.Column(db.Integer, primary_key=True)
+
+  admin_id = db.Column(
+    db.Integer,
+    db.ForeignKey("admins.admin_id"),
+    nullable=False
+  )
+
+  job_seeker_id = db.Column(
+    db.Integer,
+    db.ForeignKey("job_seekers.job_seeker_id"),
+    nullable=False
+  )
+
+  # active = 担当中, inactive = 担当解除済み
+  status = db.Column(db.String(20), default="active", nullable=False)
+
+  # 同じ管理者と求職者の組み合わせを重複登録させない
+  __table_args__ = (
+    db.UniqueConstraint(
+      "admin_id",
+      "job_seeker_id",
+      name="uq_admin_job_seeker"
+    ),
+  )
