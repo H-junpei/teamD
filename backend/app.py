@@ -2,10 +2,11 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
+from routes.admin_routes import admin_bp
 
 # DB
 from extensions import db
-from models import TimeSlot
+from models import TimeSlot, Admin
 
 # CORS
 from flask_cors import CORS
@@ -27,6 +28,7 @@ def create_app():
 
 
     db.init_app(app)
+    app.register_blueprint(admin_bp)
 
     app.register_blueprint(auth_bp)
 
