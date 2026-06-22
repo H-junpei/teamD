@@ -4,7 +4,6 @@ import AdminSelect from "./pages/AdminSelect";
 import AdminRegister from "./pages/AdminRegister"
 import AdminLogin from "./pages/AdminLogin";
 import AdminPage from "./pages/AdminPage";
-import UserPage from "./pages/UserPage";
 import Reservation from "./pages/reservation";
 import AdminJobSeekerLinkPage from "./pages/AdminJobSeekerLinkPage";
 import JobSeekerRegister from "./pages/JobSeekerRegister";
