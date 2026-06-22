@@ -4,7 +4,6 @@ import AdminSelect from "./pages/AdminSelect";
 import AdminRegister from "./pages/AdminRegister"
 import AdminLogin from "./pages/AdminLogin";
 import AdminPage from "./pages/AdminPage";
-import UserPage from "./pages/UserPage";
 import Reservation from "./pages/reservation";
 import AdminJobSeekerLinkPage from "./pages/AdminJobSeekerLinkPage";
 import JobSeekerRegister from "./pages/JobSeekerRegister";
@@ -23,7 +22,6 @@ function App() {
         <Route path="/jobseeker" element={<JobSeekerSelect />} />
         <Route path="/jobseeker/register" element={<JobSeekerRegister />} />
         <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
-        <Route path="/user" element={<UserPage />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route
           path="/admin/job-seeker-link-test"
