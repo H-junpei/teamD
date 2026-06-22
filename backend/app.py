@@ -12,6 +12,7 @@ from routes.slot import slot_bp
 from routes.admin import admin_slots_bp
 from routes.auth import auth_bp
 from routes.admin_routes import admin_bp
+from routes.admin_job_seeker import admin_job_seeker_bp
 
 def create_app():
     load_dotenv()
@@ -40,6 +41,7 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(admin_slots_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_job_seeker_bp)
 
     with app.app_context():
         db.create_all()
