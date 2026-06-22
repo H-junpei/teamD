@@ -8,13 +8,13 @@ from models import (
     JobSeeker
 )
 
-admin_bp = Blueprint("admin", __name__)
+admin_slots_bp = Blueprint("admin_slots", __name__)
 
 
 # ==================================
 # 管理者カレンダー表示用
 # ==================================
-@admin_bp.route("/api/admin/events", methods=["GET"])
+@admin_slots_bp.route("/api/admin/events", methods=["GET"])
 def get_admin_events():
 
     events = []
@@ -63,7 +63,7 @@ def get_admin_events():
 # ==================================
 # 空き枠追加（30分固定）
 # ==================================
-@admin_bp.route("/api/admin/slots", methods=["POST"])
+@admin_slots_bp.route("/api/admin/slots", methods=["POST"])
 def add_slot():
 
     data = request.json
@@ -102,7 +102,7 @@ def add_slot():
 # ==================================
 # 空き枠削除
 # ==================================
-@admin_bp.route(
+@admin_slots_bp.route(
     "/api/admin/slots/<int:slot_id>",
     methods=["DELETE"]
 )
@@ -126,7 +126,7 @@ def delete_slot(slot_id):
 # ==================================
 # 予約承認
 # ==================================
-@admin_bp.route(
+@admin_slots_bp.route(
     "/api/admin/approve/<int:slot_id>",
     methods=["POST"]
 )
@@ -161,7 +161,7 @@ def approve_reservation(slot_id):
 # ==================================
 # 予約却下
 # ==================================
-@admin_bp.route(
+@admin_slots_bp.route(
     "/api/admin/reject/<int:slot_id>",
     methods=["POST"]
 )

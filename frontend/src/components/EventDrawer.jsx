@@ -1,149 +1,141 @@
 import "./EventDrawer.css";
 
-const EventDrawer = ({
+function EventDrawer({
   event,
-  isOpen,
   onClose,
+  onDelete,
   onApprove,
-  onReject,
-}) => {
-  if (!isOpen || !event) {
-    return null;
-  }
+  onReject
+}) {
+  if (!event) return null;
 
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
+  const formatDateTime = (value) => {
+    if (!value) return "";
+
+    const date = new Date(value);
 
     return date.toLocaleString("ja-JP", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
-      minute: "2-digit",
+      minute: "2-digit"
     });
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
-      case "available":
-        return "空き枠";
+    if (status === "available") return "空き枠";
+    if (status === "pending") return "予約申請中";
+    if (status === "reserved") return "面接確定";
+    return status;
+  };
 
-      case "pending":
-        return "予約申請中";
-
-      case "reserved":
-        return "予約確定";
-
-      default:
-        return status;
-    }
+  const getStatusClassName = (status) => {
+    if (status === "available") return "status-available";
+    if (status === "pending") return "status-pending";
+    if (status === "reserved") return "status-reserved";
+    return "";
   };
 
   return (
-    <>
-      <div
-        className="drawer-overlay"
-        onClick={onClose}
-      />
-
+    <div className="drawer-overlay">
       <div className="event-drawer">
-        <div className="drawer-header">
-          <h2>予定詳細</h2>
+        <div className="event-drawer-header">
+          <div>
+            <h2>{event.title}</h2>
+            <span
+              className={`event-status ${getStatusClassName(
+                event.status
+              )}`}
+            >
+              {getStatusLabel(event.status)}
+            </span>
+          </div>
 
           <button
-            className="close-button"
+            className="drawer-close-button"
             onClick={onClose}
           >
             ×
           </button>
         </div>
 
-        <div className="drawer-content">
-          <div className="info-section">
-            <div className="label">
-              ステータス
-            </div>
-
-            <div className="value">
-              {getStatusLabel(event.status)}
-            </div>
-          </div>
-
-          <div className="info-section">
-            <div className="label">
-              タイトル
-            </div>
-
-            <div className="value">
-              {event.title}
-            </div>
-          </div>
-
-          <div className="info-section">
-            <div className="label">
-              求職者
-            </div>
-
-            <div className="value">
-              {event.jobSeeker || "-"}
-            </div>
-          </div>
-
-          <div className="info-section">
-            <div className="label">
-              メール
-            </div>
-
-            <div className="value">
-              {event.email || "-"}
-            </div>
-          </div>
-
-          <div className="info-section">
-            <div className="label">
-              開始日時
-            </div>
-
-            <div className="value">
+        <div className="event-drawer-body">
+          <div className="event-detail-row">
+            <span className="event-detail-label">
+              開始
+            </span>
+            <span>
               {formatDateTime(event.start)}
-            </div>
+            </span>
           </div>
 
-          <div className="info-section">
-            <div className="label">
-              終了日時
-            </div>
-
-            <div className="value">
+          <div className="event-detail-row">
+            <span className="event-detail-label">
+              終了
+            </span>
+            <span>
               {formatDateTime(event.end)}
-            </div>
+            </span>
           </div>
+
+          {event.jobSeeker && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">
+                求職者
+              </span>
+              <span>{event.jobSeeker}</span>
+            </div>
+          )}
+
+          {event.email && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">
+                メール
+              </span>
+              <span>{event.email}</span>
+            </div>
+          )}
         </div>
 
-        {event.status === "pending" && (
-          <div className="drawer-footer">
+        <div className="event-drawer-actions">
+          {event.status === "available" && (
             <button
-              className="approve-button"
-              onClick={() =>
-                onApprove?.(event.id)
-              }
+              className="drawer-delete-button"
+              onClick={() => onDelete(event.id)}
             >
-              承認
+              空き枠を削除
             </button>
+          )}
 
-            <button
-              className="reject-button"
-              onClick={() =>
-                onReject?.(event.id)
-              }
-            >
-              却下
-            </button>
-          </div>
-        )}
+          {event.status === "pending" && (
+            <>
+              <button
+                className="drawer-approve-button"
+                onClick={() => onApprove(event.id)}
+              >
+                承認する
+              </button>
+
+              <button
+                className="drawer-reject-button"
+                onClick={() => onReject(event.id)}
+              >
+                却下する
+              </button>
+            </>
+          )}
+
+          <button
+            className="drawer-cancel-button"
+            onClick={onClose}
+          >
+            閉じる
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
-};
+}
 
 export default EventDrawer;

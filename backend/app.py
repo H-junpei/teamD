@@ -1,4 +1,6 @@
-from flask import Flaskfrom_dotenv
+from flask import Flask
+from dotenv import load_dotenv
+from flask_cors import CORS
 
 import os
 from datetime import datetime, timedelta
@@ -7,9 +9,9 @@ from extensions import db
 from models import TimeSlot
 
 from routes.slot import slot_bp
-from routes.admin import admin_bp
+from routes.admin import admin_slots_bp
 from routes.auth import auth_bp
-
+from routes.admin_routes import admin_bp
 
 def create_app():
     load_dotenv()
@@ -32,11 +34,11 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
-    app.register_blueprint(admin_bp)
 
     # Blueprint登録
     app.register_blueprint(slot_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_slots_bp)
     app.register_blueprint(auth_bp)
 
     with app.app_context():
@@ -53,4 +55,3 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True)
-from flask_cors import CORS
