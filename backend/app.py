@@ -1,6 +1,4 @@
-from flask import Flask
-from flask_cors import CORS
-from dotenv import load_dotenv
+from flask import Flaskfrom_dotenv
 
 import os
 
@@ -8,7 +6,7 @@ from extensions import db
 
 from routes.slot import slot_bp
 from routes.admin import admin_bp
-
+from routes.auth import auth_bp
 
 
 def create_app():
@@ -36,6 +34,10 @@ def create_app():
     # Blueprint登録
     app.register_blueprint(slot_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp)
+
+    with app.app_context():
+        db.create_all()
 
     @app.route("/")
     def index():
@@ -48,3 +50,4 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True)
+from flask_cors import CORS
