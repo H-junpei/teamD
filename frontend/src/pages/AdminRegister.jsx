@@ -18,7 +18,7 @@ function AdminRegister() {
       const response = await fetch("http://127.0.0.1:5000/api/admin/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json" // サーバーに対してjson形式と教えるコード
         },
         body: JSON.stringify({
           name,
