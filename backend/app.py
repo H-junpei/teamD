@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
 from routes.admin_routes import admin_bp
+from routes.reserve_routes import reserve_bp
 
 # DB
 from extensions import db
@@ -27,10 +28,11 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 
+
     db.init_app(app)
     app.register_blueprint(admin_bp)
-
     app.register_blueprint(auth_bp)
+    app.register_blueprint(reserve_bp)
 
     with app.app_context():
         db.create_all()
@@ -60,9 +62,6 @@ def create_app():
 
         return jsonify(result)
 
-    # =========================
-    # スロット追加（クリック）
-    # =========================
     # =========================
     # スロット追加（クリック）
     # =========================
@@ -120,35 +119,8 @@ def create_app():
 
         return jsonify({"message": "対象なし"}), 404
 
-    # =========================
-    # 予約処理
-    # =========================
-    @app.route("/api/reserve", methods=["POST"])
-    def reserve():
-        data = request.json
-
-        dt = datetime.strptime(
-            f"{data['day']} {data['time']}",
-            "%Y-%m-%d %H:%M"
-        )
-
-        slot = TimeSlot.query.filter_by(start_datetime=dt).first()
-
-        if not slot:
-            return jsonify({"message": "スロットなし"}), 404
-
-        if slot.status == "reserved":
-            return jsonify({"message": "既に予約済み"}), 400
-
-        slot.status = "reserved"
-        db.session.commit()
-
-        print("✅ 予約:", data)
-
-        return jsonify({"message": "予約完了"})
 
     return app
-
 
 # =========================
 # 起動
