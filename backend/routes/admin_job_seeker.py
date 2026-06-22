@@ -3,7 +3,7 @@ from extensions import db
 from models import Admin, JobSeeker, AdminJobSeeker
 
 
-admin_job_seeker_bp = Blueprit ("admin_job_seeker", __name__)
+admin_job_seeker_bp = Blueprint ("admin_job_seeker", __name__)
 
 
 # 管理者と求職者の紐づけ登録
