@@ -1,108 +1,158 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import CalendarGrid from "../components/CalendarGrid";
+
+import AdminCalendarV2 from "../components/AdminCalendarV2";
+import EventDrawer from "../components/EventDrawer";
 
 const AdminPage = () => {
-  const [slots, setSlots] = useState([]);
-  const [startDate, setStartDate] = useState(new Date());
+  const [events, setEvents] = useState([]);
 
-  // ✅ 初期取得
+  const [selectedEvent, setSelectedEvent] =
+    useState(null);
+
+  const [isDrawerOpen, setIsDrawerOpen] =
+    useState(false);
+
+  // =========================
+  // イベント取得
+  // =========================
+
+  const fetchEvents = async () => {
+    try {
+      const res = await axios.get(
+        "http://127.0.0.1:5000/api/admin/events"
+      );
+
+      setEvents(res.data);
+    } catch (error) {
+      console.error(
+        "イベント取得失敗",
+        error
+      );
+    }
+  };
+
   useEffect(() => {
-    fetchSlots();
+    fetchEvents();
   }, []);
 
-  const fetchSlots = () => {
-    axios.get("http://127.0.0.1:5000/api/slots")
-      .then(res => {
-        console.log("① APIから来たslots:", res.data); // デバッグ①
-        setSlots(res.data);
-      })
-      .catch(err => console.error(err));
+  // =========================
+  // イベントクリック
+  // =========================
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setIsDrawerOpen(true);
   };
 
-  // ✅ 日付生成（7日分）
-  const generateDays = () => {
-    const days = [];
+  // =========================
+  // Drawer閉じる
+  // =========================
 
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(startDate);
-      d.setDate(startDate.getDate() + i);
+  const handleCloseDrawer = () => {
+    setSelectedEvent(null);
+    setIsDrawerOpen(false);
+  };
 
-      days.push(d.toISOString().split("T")[0]);
+  // =========================
+  // 空き枠作成
+  // =========================
+
+  const handleCreateSlot = async (
+    startDay,
+    startTime,
+    endDay,
+    endTime
+  ) => {
+    try {
+      await axios.post(
+        "http://127.0.0.1:5000/api/admin/slots",
+        {
+          start_day: startDay,
+          start_time: startTime,
+          end_day: endDay,
+          end_time: endTime,
+        }
+      );
+
+      fetchEvents();
+    } catch (error) {
+      console.error(error);
+      alert("空き枠登録に失敗しました");
     }
-
-    return days;
   };
 
-  const days = generateDays();
+  // =========================
+  // 承認
+  // =========================
 
-  // ✅ 前週・次週
-  const prevWeek = () => {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() - 7);
-    setStartDate(d);
-  };
+  const handleApprove = async (slotId) => {
+    try {
+      await axios.post(
+        `http://127.0.0.1:5000/api/admin/approve/${slotId}`
+      );
 
-  const nextWeek = () => {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + 7);
-    setStartDate(d);
-  };
+      await fetchEvents();
 
-  // ✅ クリック処理（トグル）
-  const handleClickSlot = (day, time, slot) => {
-    console.log("② クリック:", day, time, slot); // デバッグ②
+      handleCloseDrawer();
 
-    // 🔵 既に予約済みなら触れない（任意）
-    if (slot?.status === "reserved") {
-      return;
+      alert("予約を承認しました");
+    } catch (error) {
+      console.error(error);
+      alert("承認に失敗しました");
     }
+  };
 
-    // ✅ 未登録 → 追加
-    if (!slot) {
-      axios.post("http://127.0.0.1:5000/api/admin/slots", {
-        day,
-        time
-      })
-      .then(() => {
-        console.log("✅ 追加成功");
-        fetchSlots();
-      })
-      .catch(err => console.error(err));
-    }
+  // =========================
+  // 却下
+  // =========================
 
-    // ✅ 登録済 → 削除（トグル）
-    else if (slot.status === "available") {
-      axios.delete("http://127.0.0.1:5000/api/admin/slots", {
-        data: { day, time }
-      })
-      .then(() => {
-        console.log("🗑️ 削除成功");
-        fetchSlots();
-      })
-      .catch(err => console.error(err));
+  const handleReject = async (slotId) => {
+    try {
+      await axios.post(
+        `http://127.0.0.1:5000/api/admin/reject/${slotId}`
+      );
+
+      await fetchEvents();
+
+      handleCloseDrawer();
+
+      alert("予約を却下しました");
+    } catch (error) {
+      console.error(error);
+      alert("却下に失敗しました");
     }
   };
 
   return (
-    <div>
-      <h2>管理者：空き登録</h2>
+    <div
+      style={{
+        padding: "20px",
+        backgroundColor: "#f5f7fa",
+        minHeight: "100vh",
+      }}
+    >
+      <h1
+        style={{
+          marginBottom: "20px",
+        }}
+      >
+        面接スケジュール管理
+      </h1>
 
-      {/* ✅ 週移動 */}
-      <div style={{ marginBottom: "10px" }}>
-        <button onClick={prevWeek}>← 前の週</button>
-        <button onClick={nextWeek}>次の週 →</button>
-      </div>
-
-      {/* ✅ カレンダー */}
-      <CalendarGrid
-        slots={slots}
-        days={days}
-        onClickSlot={handleClickSlot}
+      <AdminCalendarV2
+        events={events}
+        onEventClick={handleEventClick}
+        onCreateSlot={handleCreateSlot}
       />
 
-      {/* ✅ 説明 */}
-      <p>※クリックで登録 / もう一度クリックで削除</p>
+      <EventDrawer
+        event={selectedEvent}
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
     </div>
   );
 };
