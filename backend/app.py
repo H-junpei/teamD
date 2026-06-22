@@ -6,7 +6,7 @@ from routes.admin_routes import admin_bp
 
 # DB
 from extensions import db
-from models import TimeSlot, Admin
+from models import TimeSlot, Admin, Reservation, JobSeeker, AdminJobSeeker
 
 # CORS
 from flask_cors import CORS
