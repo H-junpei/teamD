@@ -6,6 +6,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminPage from "./pages/AdminPage";
 import UserPage from "./pages/UserPage";
 import reservation from "./pages/reservation";
+import AdminJobSeekerLinkPage from "./pages/AdminJobSeekerLinkPage";
 import JobSeekerRegister from "./pages/JobSeekerRegister";
 import JobSeekerSelect from "./pages/JobSeekerSelect";
 import JobSeekerLogin from "./pages/JobSeekerLogin";
@@ -24,6 +25,10 @@ function App() {
         <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/reservation" element={<reservation />} />
+        <Route
+        path="/admin/job-seeker-link-test"
+        element={<AdminJobSeekerLinkPage />}
+        />
       </Routes>
     </BrowserRouter>
   );
