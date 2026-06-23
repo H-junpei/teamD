@@ -27,6 +27,7 @@ function App() {
           path="/admin/job-seeker-links"
           element={<AdminJobSeekerLinkPage />}
         />
+
       </Routes>
     </BrowserRouter>
   );

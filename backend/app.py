@@ -5,6 +5,7 @@ from flask_cors import CORS
 import os
 from datetime import datetime, timedelta
 from routes.admin_routes import admin_bp
+from routes.reserve_routes import reserve_bp
 from routes.job_seeker_routes import jobseeker_bp
 
 from extensions import db
@@ -38,6 +39,9 @@ def create_app():
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+
+    app.register_blueprint(reserve_bp)
+
     db.init_app(app)
     app.register_blueprint(jobseeker_bp)
 
@@ -48,6 +52,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_job_seeker_bp)
 
+
     with app.app_context():
         db.create_all()
 
@@ -55,8 +60,8 @@ def create_app():
     def index():
         return "Flask backend is running!"
 
-    return app
 
+    return app
 
 app = create_app()
 
