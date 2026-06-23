@@ -209,6 +209,11 @@ function AdminPage() {
         <p>
           30分単位で空き時間を登録・削除できます。
         </p>
+        
+        <button onClick={() => navigate("/admin/job-seeker-links")}>
+            求職者紐づけ管理
+        </button>
+
 
         <button onClick={handleLogout}>
           ログアウト
