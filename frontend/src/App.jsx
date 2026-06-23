@@ -24,7 +24,7 @@ function App() {
         <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
         <Route path="/reservation" element={<Reservation />} />
         <Route
-          path="/admin/job-seeker-link-test"
+          path="/admin/job-seeker-links"
           element={<AdminJobSeekerLinkPage />}
         />
       </Routes>
