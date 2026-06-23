@@ -30,9 +30,9 @@ const JobSeekerLogin = () => {
 
       const data = await res.json();
 
-      console.log("バックエンドからの返答:", data);
-
       if (data.role === "jobseeker") {
+        localStorage.setItem("job_seeker_id", data.job_seeker_id);
+        localStorage.setItem("job_seeker_name", data.name)
         navigate("/reservation");
       } else {
         alert("ログイン結果が正しく返ってきませんでした");
