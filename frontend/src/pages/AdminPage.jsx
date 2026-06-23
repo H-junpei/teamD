@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminCalendarV2 from "../components/AdminCalendarV2";
 import EventDrawer from "../components/EventDrawer";
 import "../components/AdminCalendarV2.css";
@@ -11,10 +12,33 @@ function AdminPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const fetchEvents = async () => {
+  const [adminId, setAdminId] = useState(null);
+  const [adminName, setAdminName] = useState("");
+
+  const navigate = useNavigate();
+
+  // ログイン中の管理者情報を確認
+  useEffect(() => {
+    const savedAdminId = localStorage.getItem("adminId");
+    const savedAdminName = localStorage.getItem("adminName");
+    const savedRole = localStorage.getItem("role");
+
+    if (!savedAdminId || savedRole !== "admin") {
+      alert("管理者ログインが必要です");
+      navigate("/admin/login");
+      return;
+    }
+
+    setAdminId(savedAdminId);
+    setAdminName(savedAdminName || "");
+  }, [navigate]);
+
+  const fetchEvents = async (targetAdminId) => {
+    if (!targetAdminId) return;
+
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/events`
+        `${API_BASE_URL}/api/admin/events?admin_id=${targetAdminId}`
       );
 
       const data = await response.json();
@@ -31,8 +55,10 @@ function AdminPage() {
   };
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (adminId) {
+      fetchEvents(adminId);
+    }
+  }, [adminId]);
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
@@ -45,6 +71,12 @@ function AdminPage() {
   };
 
   const handleAddSlot = async ({ day, time }) => {
+    if (!adminId) {
+      alert("管理者情報が取得できません。再ログインしてください。");
+      navigate("/admin/login");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/admin/slots`,
@@ -54,6 +86,7 @@ function AdminPage() {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
+            admin_id: adminId,
             day,
             time
           })
@@ -63,7 +96,7 @@ function AdminPage() {
       const data = await response.json();
 
       if (response.ok) {
-        await fetchEvents();
+        await fetchEvents(adminId);
       } else {
         alert(data.message || "空き枠の追加に失敗しました");
       }
@@ -82,7 +115,7 @@ function AdminPage() {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/slots/${slotId}`,
+        `${API_BASE_URL}/api/admin/slots/${slotId}?admin_id=${adminId}`,
         {
           method: "DELETE"
         }
@@ -93,7 +126,7 @@ function AdminPage() {
       if (response.ok) {
         alert(data.message || "空き枠を削除しました");
         handleCloseDrawer();
-        await fetchEvents();
+        await fetchEvents(adminId);
       } else {
         alert(data.message || "空き枠の削除に失敗しました");
       }
@@ -106,7 +139,7 @@ function AdminPage() {
   const handleApprove = async (slotId) => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/approve/${slotId}`,
+        `${API_BASE_URL}/api/admin/approve/${slotId}?admin_id=${adminId}`,
         {
           method: "POST"
         }
@@ -117,7 +150,7 @@ function AdminPage() {
       if (response.ok) {
         alert(data.message || "予約を承認しました");
         handleCloseDrawer();
-        await fetchEvents();
+        await fetchEvents(adminId);
       } else {
         alert(data.message || "予約承認に失敗しました");
       }
@@ -136,7 +169,7 @@ function AdminPage() {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/admin/reject/${slotId}`,
+        `${API_BASE_URL}/api/admin/reject/${slotId}?admin_id=${adminId}`,
         {
           method: "POST"
         }
@@ -147,7 +180,7 @@ function AdminPage() {
       if (response.ok) {
         alert(data.message || "予約を却下しました");
         handleCloseDrawer();
-        await fetchEvents();
+        await fetchEvents(adminId);
       } else {
         alert(data.message || "予約却下に失敗しました");
       }
@@ -157,13 +190,29 @@ function AdminPage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("adminId");
+    localStorage.removeItem("adminName");
+    localStorage.removeItem("adminEmail");
+
+    navigate("/admin/login");
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <h1>管理者カレンダー</h1>
+        <h1>
+          {adminName ? `${adminName}さんの管理者カレンダー` : "管理者カレンダー"}
+        </h1>
+
         <p>
           30分単位で空き時間を登録・削除できます。
         </p>
+
+        <button onClick={handleLogout}>
+          ログアウト
+        </button>
       </div>
 
       <AdminCalendarV2

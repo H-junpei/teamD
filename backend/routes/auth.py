@@ -48,8 +48,13 @@ def login():
         return jsonify({
             "success": True,
             "role": "admin",
-            "message": "管理者ログイン成功"
-        })
+            "message": "管理者ログイン成功",
+            "admin" : {
+            "admin_id" : admin.admin_id,
+            "name" : admin.name,
+            "email" : admin.email
+            }
+        }), 200
 
     # -------------------------
     # 求職者ログイン
