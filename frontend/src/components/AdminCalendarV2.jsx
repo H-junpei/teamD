@@ -2,25 +2,21 @@ import { useState } from "react";
 import "./AdminCalendarV2.css";
 import CalendarEvent from "./CalendarEvent";
 
+const START_HOUR = 8;
+const END_HOUR = 20;
+const SLOT_HEIGHT = 46;
+
 const TIMES = [];
 
-for (let h = 8; h <= 20; h++) {
+for (let h = START_HOUR; h <= END_HOUR; h++) {
   TIMES.push(`${String(h).padStart(2, "0")}:00`);
 
-  if (h !== 20) {
+  if (h !== END_HOUR) {
     TIMES.push(`${String(h).padStart(2, "0")}:30`);
   }
 }
 
-const WEEK_DAYS = [
-  "日",
-  "月",
-  "火",
-  "水",
-  "木",
-  "金",
-  "土",
-];
+const WEEK_DAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
 const formatDateLocal = (date) => {
   const year = date.getFullYear();
@@ -53,9 +49,6 @@ const AdminCalendarV2 = ({
     getStartOfWeek(new Date())
   );
 
-  // =========================
-  // 表示中の週の日付生成
-  // =========================
   const getWeekDays = () => {
     const days = [];
 
@@ -74,9 +67,6 @@ const AdminCalendarV2 = ({
 
   const weekDays = getWeekDays();
 
-  // =========================
-  // 週移動
-  // =========================
   const goToPreviousWeek = () => {
     setCurrentWeekStart((prev) => {
       const newDate = new Date(prev);
@@ -97,27 +87,26 @@ const AdminCalendarV2 = ({
     setCurrentWeekStart(getStartOfWeek(new Date()));
   };
 
-  // =========================
-  // イベント位置計算
-  // =========================
   const calcTop = (start) => {
     const date = new Date(start);
 
     const hour = date.getHours();
     const minute = date.getMinutes();
 
-    return (hour - 8) * 60 + minute;
+    const totalMinutesFromStart =
+      (hour - START_HOUR) * 60 + minute;
+
+    return (totalMinutesFromStart / 30) * SLOT_HEIGHT;
   };
 
   const calcHeight = (start, end) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
 
-    return (
-      (endDate.getTime() - startDate.getTime()) /
-      1000 /
-      60
-    );
+    const diffMinutes =
+      (endDate.getTime() - startDate.getTime()) / 1000 / 60;
+
+    return (diffMinutes / 30) * SLOT_HEIGHT;
   };
 
   const getEventDateString = (event) => {
@@ -138,7 +127,6 @@ const AdminCalendarV2 = ({
 
   return (
     <div className="admin-calendar-v2">
-      {/* 週ナビゲーション */}
       <div className="calendar-toolbar">
         <div className="calendar-toolbar-left">
           <button
@@ -168,85 +156,67 @@ const AdminCalendarV2 = ({
         </div>
       </div>
 
-      {/* ヘッダー */}
-      <div className="calendar-header">
-        <div className="time-column-header">
-          時間
-        </div>
+      <div className="calendar-scroll">
+        <div className="calendar-header">
+          <div className="time-column-header">時間</div>
 
-        {weekDays.map((day) => (
-          <div
-            key={day.dateString}
-            className="day-header"
-          >
-            <div className="day-header-date">
-              {formatMonthDay(day.date)}
-            </div>
+          {weekDays.map((day) => (
+            <div key={day.dateString} className="day-header">
+              <div className="day-header-date">
+                {formatMonthDay(day.date)}
+              </div>
 
-            <div className="day-header-week">
-              {WEEK_DAYS[day.date.getDay()]}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 本体 */}
-      <div className="calendar-body">
-        {/* 時間列 */}
-        <div className="time-column">
-          {TIMES.map((time) => (
-            <div
-              key={time}
-              className="time-slot"
-            >
-              {time}
+              <div className="day-header-week">
+                {WEEK_DAYS[day.date.getDay()]}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* 日付列 */}
-        {weekDays.map((day) => {
-          const dayEvents = events.filter((event) => {
-            return getEventDateString(event) === day.dateString;
-          });
+        <div className="calendar-body">
+          <div className="time-column">
+            {TIMES.map((time) => (
+              <div key={time} className="time-slot">
+                {time}
+              </div>
+            ))}
+          </div>
 
-          return (
-            <div
-              key={day.dateString}
-              className="day-column"
-            >
-              {/* 30分ブロック */}
-              {TIMES.map((time) => (
-                <div
-                  key={time}
-                  className="hour-row"
-                  onClick={() =>
-                    handleSlotClick(
-                      day.dateString,
-                      time
-                    )
-                  }
-                />
-              ))}
+          {weekDays.map((day) => {
+            const dayEvents = events.filter((event) => {
+              return getEventDateString(event) === day.dateString;
+            });
 
-              {/* イベント */}
-              {dayEvents.map((event) => (
-                <CalendarEvent
-                  key={event.id}
-                  event={event}
-                  onClick={onEventClick}
-                  style={{
-                    top: `${calcTop(event.start)}px`,
-                    height: `${calcHeight(
-                      event.start,
-                      event.end
-                    )}px`,
-                  }}
-                />
-              ))}
-            </div>
-          );
-        })}
+            return (
+              <div key={day.dateString} className="day-column">
+                {TIMES.map((time) => (
+                  <div
+                    key={time}
+                    className="hour-row"
+                    onClick={() =>
+                      handleSlotClick(day.dateString, time)
+                    }
+                  />
+                ))}
+
+                {dayEvents.map((event) => (
+                  <CalendarEvent
+                    key={event.id}
+                    event={event}
+                    onClick={onEventClick}
+                    style={{
+                      top: `${calcTop(event.start)}px`,
+                      height: `${calcHeight(
+                        event.start,
+                        event.end
+                      )}px`,
+                    }}
+                  />
+                ))}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
