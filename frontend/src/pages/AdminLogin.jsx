@@ -32,7 +32,21 @@ const AdminLogin = () => {
 
       console.log("バックエンドからの返答:", data);
 
-      if (data.role === "admin") {
+      if (!res.ok || !data.success) {
+        alert(data.message || "ログインに失敗しました");
+        return;
+      }
+
+      if (data.role === "admin" && data.admin) {
+        // ログインした管理者情報を保存
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("adminId", data.admin.admin_id);
+        localStorage.setItem("adminName", data.admin.name);
+        localStorage.setItem("adminEmail", data.admin.email);
+
+        console.log("保存した管理者ID:", data.admin.admin_id);
+        console.log("保存した管理者名:", data.admin.name);
+
         navigate("/admin/page");
       } else {
         alert("ログイン結果が正しく返ってきませんでした");

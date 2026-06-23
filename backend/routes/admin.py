@@ -5,7 +5,8 @@ from extensions import db
 from models import (
     TimeSlot,
     Reservation,
-    JobSeeker
+    JobSeeker,
+    AdminJobSeeker
 )
 
 admin_slots_bp = Blueprint("admin_slots", __name__)
@@ -16,21 +17,45 @@ admin_slots_bp = Blueprint("admin_slots", __name__)
 # ==================================
 @admin_slots_bp.route("/api/admin/events", methods=["GET"])
 def get_admin_events():
+    admin_id = request.args.get("admin_id", type=int)
+
+    if not admin_id:
+        return jsonify({
+            "message": "admin_id が必要です"
+        }), 400
 
     events = []
 
-    slots = TimeSlot.query.all()
+    # ログイン管理者に紐づいている求職者IDを取得
+    linked_job_seeker_ids = [
+        link.job_seeker_id
+        for link in AdminJobSeeker.query.filter_by(
+            admin_id=admin_id,
+            status="active"
+        ).all()
+    ]
+
+    # ログイン管理者の空き枠だけ取得
+    slots = TimeSlot.query.filter_by(
+        admin_id=admin_id
+    ).order_by(TimeSlot.start_datetime.asc()).all()
 
     for slot in slots:
-
         reservation = Reservation.query.filter_by(
             time_slot_id=slot.time_slot_id
         ).first()
 
         job_seeker_name = None
         email = None
+        reservation_id = None
+        job_seeker_id = None
 
+        # 予約がある場合
         if reservation:
+            # 予約している求職者が、この管理者の担当外なら表示しない
+            if reservation.job_seeker_id not in linked_job_seeker_ids:
+                continue
+
             seeker = JobSeeker.query.get(
                 reservation.job_seeker_id
             )
@@ -38,6 +63,9 @@ def get_admin_events():
             if seeker:
                 job_seeker_name = seeker.name
                 email = seeker.email
+                job_seeker_id = seeker.job_seeker_id
+
+            reservation_id = reservation.reservation_id
 
         title = "空き枠"
 
@@ -47,17 +75,26 @@ def get_admin_events():
         elif slot.status == "reserved":
             title = "面接確定"
 
+        elif slot.status == "booked":
+            title = "予約済み"
+
+        elif slot.status == "available":
+            title = "空き枠"
+
         events.append({
             "id": slot.time_slot_id,
+            "timeSlotId": slot.time_slot_id,
+            "reservationId": reservation_id,
             "title": title,
             "status": slot.status,
+            "jobSeekerId": job_seeker_id,
             "jobSeeker": job_seeker_name,
             "email": email,
             "start": slot.start_datetime.isoformat(),
             "end": slot.end_datetime.isoformat(),
         })
 
-    return jsonify(events)
+    return jsonify(events), 200
 
 
 # ==================================
@@ -65,15 +102,40 @@ def get_admin_events():
 # ==================================
 @admin_slots_bp.route("/api/admin/slots", methods=["POST"])
 def add_slot():
+    data = request.get_json()
 
-    data = request.json
+    if not data:
+        return jsonify({
+            "message": "データが送られていません"
+        }), 400
 
-    start_dt = datetime.strptime(
-        f"{data['day']} {data['time']}",
-        "%Y-%m-%d %H:%M"
-    )
+    admin_id = data.get("admin_id")
+    day = data.get("day")
+    time = data.get("time")
 
+    if not admin_id or not day or not time:
+        return jsonify({
+            "message": "admin_id, day, time が必要です"
+        }), 400
+
+    try:
+        admin_id = int(admin_id)
+
+        start_dt = datetime.strptime(
+            f"{day} {time}",
+            "%Y-%m-%d %H:%M"
+        )
+
+    except ValueError:
+        return jsonify({
+            "message": "日付または時刻の形式が不正です"
+        }), 400
+
+    end_dt = start_dt + timedelta(minutes=30)
+
+    # 同じ管理者の同じ時間帯だけ重複禁止
     exists = TimeSlot.query.filter_by(
+        admin_id=admin_id,
         start_datetime=start_dt
     ).first()
 
@@ -82,10 +144,8 @@ def add_slot():
             "message": "既に存在します"
         }), 400
 
-    end_dt = start_dt + timedelta(minutes=30)
-
     new_slot = TimeSlot(
-        admin_id=1,
+        admin_id=admin_id,
         start_datetime=start_dt,
         end_datetime=end_dt,
         status="available"
@@ -95,8 +155,15 @@ def add_slot():
     db.session.commit()
 
     return jsonify({
-        "message": "追加完了"
-    })
+        "message": "追加完了",
+        "slot": {
+            "time_slot_id": new_slot.time_slot_id,
+            "admin_id": new_slot.admin_id,
+            "start": new_slot.start_datetime.isoformat(),
+            "end": new_slot.end_datetime.isoformat(),
+            "status": new_slot.status
+        }
+    }), 201
 
 
 # ==================================
@@ -107,6 +174,12 @@ def add_slot():
     methods=["DELETE"]
 )
 def delete_slot(slot_id):
+    admin_id = request.args.get("admin_id", type=int)
+
+    if not admin_id:
+        return jsonify({
+            "message": "admin_id が必要です"
+        }), 400
 
     slot = TimeSlot.query.get(slot_id)
 
@@ -115,12 +188,27 @@ def delete_slot(slot_id):
             "message": "対象なし"
         }), 404
 
+    # 自分の空き枠以外は削除できない
+    if slot.admin_id != admin_id:
+        return jsonify({
+            "message": "この空き枠を削除する権限がありません"
+        }), 403
+
+    reservation = Reservation.query.filter_by(
+        time_slot_id=slot.time_slot_id
+    ).first()
+
+    if reservation:
+        return jsonify({
+            "message": "予約が存在するため削除できません"
+        }), 400
+
     db.session.delete(slot)
     db.session.commit()
 
     return jsonify({
         "message": "削除完了"
-    })
+    }), 200
 
 
 # ==================================
@@ -131,6 +219,12 @@ def delete_slot(slot_id):
     methods=["POST"]
 )
 def approve_reservation(slot_id):
+    admin_id = request.args.get("admin_id", type=int)
+
+    if not admin_id:
+        return jsonify({
+            "message": "admin_id が必要です"
+        }), 400
 
     slot = TimeSlot.query.get(slot_id)
 
@@ -138,6 +232,12 @@ def approve_reservation(slot_id):
         return jsonify({
             "message": "対象なし"
         }), 404
+
+    # 自分の空き枠以外は承認できない
+    if slot.admin_id != admin_id:
+        return jsonify({
+            "message": "この予約を承認する権限がありません"
+        }), 403
 
     reservation = Reservation.query.filter_by(
         time_slot_id=slot_id
@@ -148,6 +248,18 @@ def approve_reservation(slot_id):
             "message": "予約申請なし"
         }), 404
 
+    # 予約者がこの管理者の担当求職者か確認
+    link = AdminJobSeeker.query.filter_by(
+        admin_id=admin_id,
+        job_seeker_id=reservation.job_seeker_id,
+        status="active"
+    ).first()
+
+    if not link:
+        return jsonify({
+            "message": "担当外の求職者のため承認できません"
+        }), 403
+
     reservation.status = "approved"
     slot.status = "reserved"
 
@@ -155,7 +267,7 @@ def approve_reservation(slot_id):
 
     return jsonify({
         "message": "承認完了"
-    })
+    }), 200
 
 
 # ==================================
@@ -166,6 +278,12 @@ def approve_reservation(slot_id):
     methods=["POST"]
 )
 def reject_reservation(slot_id):
+    admin_id = request.args.get("admin_id", type=int)
+
+    if not admin_id:
+        return jsonify({
+            "message": "admin_id が必要です"
+        }), 400
 
     slot = TimeSlot.query.get(slot_id)
 
@@ -173,6 +291,12 @@ def reject_reservation(slot_id):
         return jsonify({
             "message": "対象なし"
         }), 404
+
+    # 自分の空き枠以外は却下できない
+    if slot.admin_id != admin_id:
+        return jsonify({
+            "message": "この予約を却下する権限がありません"
+        }), 403
 
     reservation = Reservation.query.filter_by(
         time_slot_id=slot_id
@@ -183,6 +307,18 @@ def reject_reservation(slot_id):
             "message": "予約申請なし"
         }), 404
 
+    # 予約者がこの管理者の担当求職者か確認
+    link = AdminJobSeeker.query.filter_by(
+        admin_id=admin_id,
+        job_seeker_id=reservation.job_seeker_id,
+        status="active"
+    ).first()
+
+    if not link:
+        return jsonify({
+            "message": "担当外の求職者のため却下できません"
+        }), 403
+
     db.session.delete(reservation)
 
     slot.status = "available"
@@ -191,4 +327,4 @@ def reject_reservation(slot_id):
 
     return jsonify({
         "message": "却下完了"
-    })
+    }), 200
