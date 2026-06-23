@@ -30,9 +30,12 @@ const JobSeekerLogin = () => {
 
       const data = await res.json();
 
-      if (data.role === "jobseeker") {
+
+      if (data.success && data.role === "jobseeker") {
+        localStorage.setItem("role", "jobseeker");
         localStorage.setItem("job_seeker_id", data.job_seeker_id);
-        localStorage.setItem("job_seeker_name", data.name)
+        localStorage.setItem("user_name", data.name);
+        localStorage.setItem("user_email", email);
         navigate("/reservation");
       } else {
         alert("ログイン結果が正しく返ってきませんでした");

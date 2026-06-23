@@ -14,24 +14,25 @@ def reserve():
     name = data.get("name")
 
     if not day or not time:
-        
-      if not name:
-          return jsonify({"message": "name は必須です"}), 400
+        return jsonify({"message": "day と time は必須です"}), 400
 
-      job_seeker = JobSeeker.query.filter_by(name=name).first()
+    if not name:
+        return jsonify({"message": "name は必須です"}), 400
 
-      if not job_seeker:
-          return jsonify({"message": "求職者が見つかりません"}), 404
+    job_seeker = JobSeeker.query.filter_by(name=name).first()
 
-      existing_reservation = Reservation.query.filter_by(
-          job_seeker_id=job_seeker.job_seeker_id
-      ).first()
+    if not job_seeker:
+        return jsonify({"message": "求職者が見つかりません"}), 404
+
+    existing_reservation = Reservation.query.filter_by(
+        job_seeker_id=job_seeker.job_seeker_id,
+        status="active"
+    ).first()
 
     if existing_reservation:
         return jsonify({
             "message": "すでに別の枠を予約済みです。1人1件までです"
-          }), 400
-
+        }), 400
 
     try:
         dt = datetime.strptime(f"{day} {time}", "%Y-%m-%d %H:%M")
