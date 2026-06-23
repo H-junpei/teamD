@@ -30,8 +30,6 @@ const JobSeekerLogin = () => {
 
       const data = await res.json();
 
-      console.log("バックエンドからの返答:", data);
-
       if (data.role === "jobseeker") {
         localStorage.setItem("job_seeker_id", data.job_seeker_id);
         localStorage.setItem("job_seeker_name", data.name)
