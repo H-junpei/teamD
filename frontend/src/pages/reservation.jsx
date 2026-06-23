@@ -17,7 +17,13 @@ const reservation = () => {
       setLoading(true);
       setMessage("");
 
-      const res = await axios.get(`${API_BASE}/api/slots`);
+      const jobSeekerId = localStorage.getItem("job_seeker_id");
+
+      const res = await axios.get(`${API_BASE}/api/slots`, {
+        params: {
+          job_seeker_id: jobSeekerId
+        }
+      });
       setSlots(res.data);
     } catch (err) {
       console.error(err);

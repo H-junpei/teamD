@@ -75,6 +75,8 @@ def login():
         return jsonify({
             "success": True,
             "role": "jobseeker",
+            "job_seeker_id": user.job_seeker_id,
+            "name": user.name,
             "message": "求職者ログイン成功"
         })
 
