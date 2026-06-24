@@ -1,60 +1,55 @@
 .calendar-event-card {
   position: absolute;
 
+  /*
+    日付列の中で横 4pxだけ左右に余白を残す    日付列の中で横幅いっぱいにする
+  */
   left: 4px;
   right: 4px;
+  width: auto;
+  max-width: none;
+
+  z-index: 10;
 
   border-radius: 8px;
-
   padding: 6px;
 
   color: white;
-
   cursor: pointer;
-
   overflow: hidden;
-
   box-sizing: border-box;
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease;
 }
 
 .calendar-event-card:hover {
-  transform: translateY(-1px);
-
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .event-status {
   font-size: 11px;
-
   font-weight: bold;
-
   margin-bottom: 4px;
+  line-height: 1.2;
 }
 
 .event-seeker {
   font-size: 13px;
-
   font-weight: 600;
-
   margin-bottom: 4px;
+  line-height: 1.2;
 
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
 .event-time {
   font-size: 11px;
-
   opacity: 0.95;
+  line-height: 1.2;
 }
 
 /* =========================

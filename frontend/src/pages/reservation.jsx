@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import CalendarGrid from "../components/CalendarGrid";
+import JobSeekerCalendarV2 from "../components/JobSeekerCalendarV2";
 
 const API_BASE = "http://127.0.0.1:5000";
 
 const Reservation = () => {
   const [slots, setSlots] = useState([]);
-  const [startDate, setStartDate] = useState(new Date());
+  //const [startDate, setStartDate] = useState(new Date());
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +37,7 @@ const Reservation = () => {
     fetchSlots();
   }, []);
 
+  /*
   const generateDays = () => {
     const days = [];
 
@@ -50,7 +51,7 @@ const Reservation = () => {
   };
 
   const days = generateDays();
-
+  
   const prevWeek = () => {
     const d = new Date(startDate);
     d.setDate(startDate.getDate() - 7);
@@ -62,6 +63,7 @@ const Reservation = () => {
     d.setDate(startDate.getDate() + 7);
     setStartDate(d);
   };
+  */
 
   const handleClickSlot = async (day, time, slot) => {
     // 枠がない or available でないなら予約しない
@@ -101,10 +103,6 @@ const Reservation = () => {
       {userName && <p>利用者名：{userName}</p>}
 
       <div style={{ marginBottom: "12px" }}>
-        <button onClick={prevWeek}>← 前の週</button>
-        <button onClick={nextWeek} style={{ marginLeft: "8px" }}>
-          次の週 →
-        </button>
         <button onClick={fetchSlots} style={{ marginLeft: "8px" }}>
           再読み込み
         </button>
@@ -119,9 +117,8 @@ const Reservation = () => {
       {loading ? (
         <p>読み込み中...</p>
       ) : (
-        <CalendarGrid
+        <JobSeekerCalendarV2
           slots={slots}
-          days={days}
           onClickSlot={handleClickSlot}
         />
       )}
