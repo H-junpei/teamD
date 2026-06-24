@@ -78,6 +78,7 @@ const Reservation = () => {
       setMessage("");
 
       await axios.post(`${API_BASE}/api/reserve`, {
+        time_slot_id: slot.id,
         day,
         time,
         name: userName || ""

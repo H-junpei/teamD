@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from datetime import datetime
 
 from extensions import db
 from models import TimeSlot, Reservation, JobSeeker
@@ -12,9 +11,18 @@ def reserve():
     day = data.get("day")
     time = data.get("time")
     name = data.get("name")
+    time_slot_id = data.get("time_slot_id")
 
     if not day or not time:
         return jsonify({"message": "day と time は必須です"}), 400
+
+    if not time_slot_id:
+        return jsonify({"message": "time_slot_id は必須です"}), 400
+
+    try:
+        time_slot_id = int(time_slot_id)
+    except (TypeError, ValueError):
+        return jsonify({"message": "time_slot_id の形式が不正です"}), 400
 
     if not name:
         return jsonify({"message": "name は必須です"}), 400
@@ -34,12 +42,7 @@ def reserve():
             "message": "すでに別の枠を予約済みです。1人1件までです"
         }), 400
 
-    try:
-        dt = datetime.strptime(f"{day} {time}", "%Y-%m-%d %H:%M")
-    except ValueError:
-        return jsonify({"message": "日付形式が不正です"}), 400
-
-    slot = TimeSlot.query.filter_by(start_datetime=dt).first()
+    slot = TimeSlot.query.get(time_slot_id)
 
     if not slot:
         return jsonify({"message": "スロットなし"}), 404
@@ -59,7 +62,8 @@ def reserve():
     print("✅ 予約:", {
         "day": day,
         "time": time,
-        "name": name
+        "name": name,
+        "time_slot_id": time_slot_id
     })
 
     return jsonify({"message": "予約完了"})
