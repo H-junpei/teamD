@@ -9,8 +9,9 @@ function AdminSelect() {
 
       <button onClick={() => navigate("/admin/register")}>新規登録</button>
       <button onClick={() => navigate("/admin/login")}>ログイン</button>
-      <button onClick={() => navigate(-1)}>戻る</button>
+      <button onClick={() => navigate("/")}>戻る</button>
     </div>
+
 
   )
 }
