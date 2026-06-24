@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #d3dee7, #bcf9fc);
+}
+
+/* 中央配置 */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* カード */
+.login-card {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  text-align: center;
+}
+
+/* タイトル */
+.login-title {
+  font-size: 26px;
+  margin-bottom: 30px;
+}
+
+/* ボタン共通 */
+.login-button {
+  width: 100%;
+  padding: 16px;
+  /* ←押しやすさUP */
+  margin-top: 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+/* 管理者 */
+.admin-button {
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+  color: white;
+}
+
+.admin-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 122, 24, 0.4);
+}
+
+/* 求職者 */
+.jobseeker-button {
+  background: linear-gradient(135deg, #4facfe, #00c6ff);
+  color: white;
+}
+
+.jobseeker-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+}
