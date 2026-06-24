@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminJobSeekerLinkPage.css";
 
 const API_BASE_URL = "http://127.0.0.1:5000";
 
 function AdminJobSeekerLinkPage() {
+
+  const navigate = useNavigate();
+
   const [admins, setAdmins] = useState([]);
   const [jobSeekers, setJobSeekers] = useState([]);
   const [links, setLinks] = useState([]);
@@ -151,6 +155,15 @@ function AdminJobSeekerLinkPage() {
     <div className="admin-jobseeker-link-page">
       <header className="link-page-header">
         <div>
+            <button
+            type="button"
+            className="back-admin-button"
+            onClick={() => navigate("/admin/page")}
+            >
+                <span className="back-icon">←</span>
+                管理者画面に戻る
+                </button>
+
           <h1>管理者・求職者 紐づけ登録</h1>
           <p>
             登録済みの管理者と求職者をクリックで選択し、担当関係を登録します。
