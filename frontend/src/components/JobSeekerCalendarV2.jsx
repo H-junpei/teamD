@@ -25,8 +25,15 @@ const JobSeekerCalendarV2 = ({ slots, onClickSlot }) => {
     // 空き枠以外はクリック不可
     if (event.status !== "available") return;
 
-    const day = event.start.toISOString().split("T")[0];
-    const time = event.start.toTimeString().slice(0, 5);
+
+    const day = event.start.toLocaleDateString("sv-SE");
+
+    const time = event.start.toLocaleTimeString("ja-JP", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
 
     onClickSlot?.(day, time, event.raw);
   };
