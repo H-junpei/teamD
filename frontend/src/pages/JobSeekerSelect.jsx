@@ -9,6 +9,7 @@ function JobSeekerSelect() {
 
       <button onClick={() => navigate("/jobseeker/register")}>新規登録</button>
       <button onClick={() => navigate("/jobseeker/login")}>ログイン</button>
+      <button onClick={() => navigate(-1)}>戻る</button>
     </div>
   )
 }
