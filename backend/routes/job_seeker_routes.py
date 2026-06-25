@@ -39,7 +39,7 @@ def register_jobseeker():
     db.session.commit()
 
     return jsonify({
-        "message": "管理者登録が完了しました",
+        "message": "求職者登録が完了しました",
         "jobseeker": {
             "jobseeker_id": new_jobseeker.job_seeker_id,
             "name": new_jobseeker.name,
