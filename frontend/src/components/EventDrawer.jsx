@@ -5,7 +5,8 @@ function EventDrawer({
   onClose,
   onDelete,
   onApprove,
-  onReject
+  onReject,
+  onCancel
 }) {
   if (!event) return null;
 
@@ -125,6 +126,15 @@ function EventDrawer({
               </button>
             </>
           )}
+
+        {event.status === "reserved" && (
+            <button
+            className="drawer-delete-button"
+            onClick={() => onCancel(event.id)}
+            >
+                面談予定を削除
+                </button>
+            )}
 
           <button
             className="drawer-cancel-button"

@@ -190,6 +190,36 @@ function AdminPage() {
     }
   };
 
+const handleCancelReservation = async (slotId) => {
+  const ok = window.confirm(
+    "この面談予定を削除しますか？"
+  );
+
+  if (!ok) return;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/admin/cancel/${slotId}?admin_id=${adminId}`,
+      {
+        method: "POST"
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message || "面談予定を削除しました");
+      handleCloseDrawer();
+      await fetchEvents(adminId);
+    } else {
+      alert(data.message || "面談予定の削除に失敗しました");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("サーバーとの通信に失敗しました");
+  }
+};
+
   const handleLogout = () => {
     localStorage.removeItem("role");
     localStorage.removeItem("adminId");
@@ -233,6 +263,7 @@ function AdminPage() {
           onDelete={handleDeleteSlot}
           onApprove={handleApprove}
           onReject={handleReject}
+          onCancel={handleCancelReservation}
         />
       )}
     </div>
