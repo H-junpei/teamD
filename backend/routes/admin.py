@@ -328,3 +328,37 @@ def reject_reservation(slot_id):
     return jsonify({
         "message": "却下完了"
     }), 200
+
+@admin_slots_bp.route(
+    "/api/admin/cancel/<int:slot_id>",
+    methods=["POST"]
+)
+def cancel_reservation(slot_id):
+    admin_id = request.args.get("admin_id", type=int)
+
+    slot = TimeSlot.query.get(slot_id)
+
+    if not slot:
+        return jsonify({
+            "message": "スロットが存在しません"
+        }), 404
+
+    if slot.admin_id != admin_id:
+        return jsonify({
+            "message": "権限がありません"
+        }), 403
+
+    reservation = Reservation.query.filter_by(
+        time_slot_id=slot_id
+    ).first()
+
+    if reservation:
+        db.session.delete(reservation)
+
+    slot.status = "available"
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "面談予定を削除しました"
+    })
