@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./JobSeekerLogin.css";
 
 const JobSeekerLogin = () => {
   const [name, setName] = useState("");
@@ -46,35 +47,51 @@ const JobSeekerLogin = () => {
     }
   };
 
-  return (
-    <div>
-      <h3>求職者ログイン</h3>
+return (
+  <div className="login-page">
+    <div className="login-card">
+      <h1>求職者ログイン</h1>
 
-      <input
-        type="text"
-        placeholder="名前を入力"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+      <p className="sub-title">
+        面談スケジュール管理システム
+      </p>
 
-      <br />
-      <br />
+      <div className="input-group">
+        <label>氏名</label>
+        <input
+          type="text"
+          placeholder="氏名を入力"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
 
-      <input
-        type="email"
-        placeholder="メールアドレス"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div className="input-group">
+        <label>メールアドレス</label>
+        <input
+          type="email"
+          placeholder="example@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
 
-      <br />
-      <br />
+      <button
+        className="jobseeker-login-btn"
+        onClick={handleLogin}
+      >
+        👤 ログイン
+      </button>
 
-      <button onClick={handleLogin}>ログイン</button>
-
-      <button onClick={() => navigate("/jobseeker")}>戻る</button>
+      <button
+        className="back-btn"
+        onClick={() => navigate("/jobseeker")}
+      >
+        ← 戻る
+      </button>
     </div>
-  );
+  </div>
+);
 };
 
 export default JobSeekerLogin;

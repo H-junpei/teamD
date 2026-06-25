@@ -1,0 +1,99 @@
+.jobseeker-select-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    90deg,
+    #d7e6ef,
+    #c8e6ea
+  );
+}
+
+.jobseeker-select-card {
+  width: 550px;
+  background: white;
+
+  border-radius: 25px;
+  padding: 60px 50px;
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+
+  text-align: center;
+}
+
+.jobseeker-select-card h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.sub-title {
+  color: #777;
+  margin-bottom: 50px;
+}
+
+.login-main-btn {
+  width: 100%;
+  padding: 28px;
+
+  border: none;
+  border-radius: 20px;
+
+  font-size: 32px;
+  font-weight: bold;
+
+  color: white;
+  cursor: pointer;
+
+  background: linear-gradient(
+    90deg,
+    #5b9df0,
+    #4eb5e9
+  );
+
+  transition: 0.2s;
+}
+
+.login-main-btn:hover {
+  transform: translateY(-3px);
+}
+
+.register-area {
+  margin-top: 35px;
+  text-align: right;
+}
+
+.register-area p {
+  font-size: 15px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.register-link-btn {
+  border: none;
+  background: none;
+
+  color: #4a90e2;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.register-link-btn:hover {
+  text-decoration: underline;
+}
+
+.back-btn {
+  margin-top: 40px;
+
+  border: none;
+  background: none;
+
+  color: #666;
+  font-size: 16px;
+
+  cursor: pointer;
+}
