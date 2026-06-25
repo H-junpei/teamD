@@ -15,6 +15,7 @@ const JobSeekerCalendarV2 = ({ slots, onClickSlot }) => {
         start,
         end,
         status: slot.status,
+        job_seeker_id: slot.job_seeker_id,
         raw: slot, // 元データ保持
       };
     });
@@ -23,8 +24,11 @@ const JobSeekerCalendarV2 = ({ slots, onClickSlot }) => {
   // クリック時（予約処理）
   const handleEventClick = (event) => {
     // 空き枠以外はクリック不可
-    if (event.status !== "available") return;
 
+    if (
+      event.status !== "available" &&
+      event.status !== "pending"
+    ) return;
 
     const day = event.start.toLocaleDateString("sv-SE");
 
