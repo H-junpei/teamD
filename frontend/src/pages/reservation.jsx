@@ -12,12 +12,12 @@ const Reservation = () => {
 
   const userName = localStorage.getItem("user_name");
 
+  const jobSeekerId = localStorage.getItem("job_seeker_id");
+
   const fetchSlots = async () => {
     try {
       setLoading(true);
       setMessage("");
-
-      const jobSeekerId = localStorage.getItem("job_seeker_id");
 
       const res = await axios.get(`${API_BASE}/api/slots`, {
         params: {
@@ -37,62 +37,53 @@ const Reservation = () => {
     fetchSlots();
   }, []);
 
-  /*
-  const generateDays = () => {
-    const days = [];
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(startDate);
-      d.setDate(startDate.getDate() + i);
-      days.push(d.toISOString().split("T")[0]);
-    }
-
-    return days;
-  };
-
-  const days = generateDays();
-  
-  const prevWeek = () => {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() - 7);
-    setStartDate(d);
-  };
-
-  const nextWeek = () => {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + 7);
-    setStartDate(d);
-  };
-  */
-
   const handleClickSlot = async (day, time, slot) => {
-    // 枠がない or available でないなら予約しない
-    if (!slot || slot.status !== "available") {
+
+    if (!slot) {
       return;
     }
 
-    const ok = window.confirm(`${day} ${time} を予約しますか？`);
-    if (!ok) return;
-
     try {
       setMessage("");
+      if (slot.status === "available") {
+        const ok = window.confirm(`${day} ${time} を予約しますか？`);
+        if (!ok) return;
 
-      await axios.post(`${API_BASE}/api/reserve`, {
-        time_slot_id: slot.id,
-        day,
-        time,
-        name: userName || ""
-      });
+        await axios.post(`${API_BASE}/api/reserve`, {
+          time_slot_id: slot.id,
+          day,
+          time,
+          name: userName || ""
+        });
 
-      setMessage(`予約完了：${day} ${time}`);
-      await fetchSlots();
+        setMessage(`予約完了：${day} ${time}`);
+        await fetchSlots();
+        return;
+      }
+
+      if (
+        slot.status === "pending" &&
+        String(slot.job_seeker_id) === String(jobSeekerId)
+      ) {
+        const ok = window.confirm(`${day} ${time} の予約を取り消しますか？`);
+        if (!ok) return;
+
+        await axios.post(`${API_BASE}/api/reserve/cancel`, {
+          time_slot_id: slot.id,
+          job_seeker_id: jobSeekerId
+        });
+
+        setMessage(`予約を取り消しました：${day} ${time}`);
+        await fetchSlots();
+        return;
+      }
     } catch (err) {
       console.error(err);
 
       if (err.response?.data?.message) {
         setMessage(err.response.data.message);
       } else {
-        setMessage("予約に失敗しました");
+        setMessage("処理に失敗しました");
       }
     }
   };
@@ -125,7 +116,7 @@ const Reservation = () => {
       )}
 
       <p style={{ marginTop: "12px" }}>
-        ※ 緑の枠をクリックすると予約できます
+        ※ 緑の枠は予約できます。自分の承認待ち枠はクリックで取り消せます。
       </p>
     </div>
   );

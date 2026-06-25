@@ -66,4 +66,52 @@ def reserve():
         "time_slot_id": time_slot_id
     })
 
-    return jsonify({"message": "予約完了"})
+    return jsonify({"message": "予約完了"}), 200
+
+
+@reserve_bp.route("/api/reserve/cancel", methods=["POST"])
+def cancel_reservation():
+    data = request.json
+
+    time_slot_id = data.get("time_slot_id")
+    job_seeker_id = data.get("job_seeker_id")
+
+    if not time_slot_id or not job_seeker_id:
+        return jsonify({
+            "message": "time_slot_id と job_seeker_id は必須です"
+        }), 400
+
+    try:
+        time_slot_id = int(time_slot_id)
+        job_seeker_id = int(job_seeker_id)
+    except (TypeError, ValueError):
+        return jsonify({
+            "message": "time_slot_id または job_seeker_id の形式が不正です"
+        }), 400
+
+    slot = TimeSlot.query.get(time_slot_id)
+
+    if not slot:
+        return jsonify({"message": "対象の枠が見つかりません"}), 404
+
+    reservation = Reservation.query.filter_by(
+        time_slot_id=time_slot_id,
+        job_seeker_id=job_seeker_id,
+        status="active"
+    ).first()
+
+    if not reservation:
+        return jsonify({
+            "message": "取消対象の予約が見つかりません"
+        }), 404
+
+    if slot.status != "pending":
+        return jsonify({
+            "message": "承認済みの予約は取り消せません"
+        }), 400
+
+    db.session.delete(reservation)
+    slot.status = "available"
+    db.session.commit()
+
+    return jsonify({"message": "予約を取り消しました"}), 200
