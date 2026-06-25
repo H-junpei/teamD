@@ -236,19 +236,32 @@ const handleCancelReservation = async (slotId) => {
           {adminName ? `${adminName}さんの管理者カレンダー` : "管理者カレンダー"}
         </h1>
 
-        <p>
-          30分単位で空き時間を登録・削除できます。
+       <p>
+        30分単位で空き時間を登録・削除できます。
         </p>
-        
-        <button onClick={() => navigate("/admin/job-seeker-links")}>
-            求職者紐づけ管理
-        </button>
+        <div className="admin-header-actions">
+            <button
+            className="link-manage-button"
+            onClick={() => navigate("/admin/job-seeker-links")}
+            >
+                担当求職者の管理
+            </button>
 
+            <button
+            className="refresh-button"
+            onClick={() => fetchEvents(adminId)}
+            >
+                🔄
+            </button>
 
-        <button onClick={handleLogout}>
-          ログアウト
-        </button>
-      </div>
+            <button
+            className="logout-button"
+            onClick={handleLogout}
+            >
+                ログアウト
+            </button>
+        </div>
+    </div>
 
       <AdminCalendarV2
         events={events}
