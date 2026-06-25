@@ -57,7 +57,7 @@ function EventDrawer({
             className="drawer-close-button"
             onClick={onClose}
           >
-            ×
+            閉じる
           </button>
         </div>
 
@@ -136,12 +136,12 @@ function EventDrawer({
                 </button>
             )}
 
-          <button
+          {/* <button
             className="drawer-cancel-button"
             onClick={onClose}
           >
             閉じる
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
