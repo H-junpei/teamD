@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import JobSeekerCalendarV2 from "../components/JobSeekerCalendarV2";
 
@@ -9,6 +10,7 @@ const Reservation = () => {
   //const [startDate, setStartDate] = useState(new Date());
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const userName = localStorage.getItem("user_name");
 
@@ -31,6 +33,15 @@ const Reservation = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("job_seeker_id");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_email");
+
+    navigate("/jobseeker/login");
   };
 
   useEffect(() => {
@@ -89,15 +100,31 @@ const Reservation = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
-      <h2>予約ページ</h2>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <h1>
+          {userName ? `${userName}さんの予約カレンダー` : "予約カレンダー"}
+        </h1>
 
-      {userName && <p>利用者名：{userName}</p>}
+        <p>
+          予約の登録・確認・取消ができます。
+        </p>
 
-      <div style={{ marginBottom: "12px" }}>
-        <button onClick={fetchSlots} style={{ marginLeft: "8px" }}>
-          再読み込み
-        </button>
+        <div className="admin-header-actions">
+          <button
+            className="refresh-button"
+            onClick={fetchSlots}
+          >
+            🔄
+          </button>
+
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            ログアウト
+          </button>
+        </div>
       </div>
 
       {message && (
