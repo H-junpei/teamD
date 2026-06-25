@@ -7,56 +7,58 @@ admin_job_seeker_bp = Blueprint ("admin_job_seeker", __name__)
 
 
 # 管理者と求職者の紐づけ登録
+# 管理者と求職者の紐づけ登録
 @admin_job_seeker_bp.route("/api/admin/job-seekers/link", methods=["POST"])
 def link_admin_job_seeker():
     data = request.get_json()
 
     admin_id = data.get("admin_id")
-    job_seeker_id = data.get("job_seeker_id")
+    job_seeker_ids = data.get("job_seeker_ids", [])
 
-    if not admin_id or not job_seeker_id:
+    if not admin_id or len(job_seeker_ids) == 0:
         return jsonify({
-            "error": "admin_id と job_seeker_id は必須です"
+            "error": "admin_id と job_seeker_ids は必須です"
         }), 400
 
     admin = Admin.query.get(admin_id)
-    job_seeker = JobSeeker.query.get(job_seeker_id)
 
     if not admin:
         return jsonify({
             "error": "指定された管理者が存在しません"
         }), 404
 
-    if not job_seeker:
-        return jsonify({
-            "error": "指定された求職者が存在しません"
-        }), 404
+    created_count = 0
 
-    existing_link = AdminJobSeeker.query.filter_by(
-        admin_id=admin_id,
-        job_seeker_id=job_seeker_id,
-        status="active"
-    ).first()
+    for job_seeker_id in job_seeker_ids:
 
-    if existing_link:
-        return jsonify({
-            "error": "この管理者と求職者はすでに紐づけされています"
-        }), 409
+        job_seeker = JobSeeker.query.get(job_seeker_id)
 
-    new_link = AdminJobSeeker(
-        admin_id=admin_id,
-        job_seeker_id=job_seeker_id,
-        status="active"
-    )
+        if not job_seeker:
+            continue
 
-    db.session.add(new_link)
+        existing_link = AdminJobSeeker.query.filter_by(
+            admin_id=admin_id,
+            job_seeker_id=job_seeker_id,
+            status="active"
+        ).first()
+
+        if existing_link:
+            continue
+
+        new_link = AdminJobSeeker(
+            admin_id=admin_id,
+            job_seeker_id=job_seeker_id,
+            status="active"
+        )
+
+        db.session.add(new_link)
+        created_count += 1
+
     db.session.commit()
 
     return jsonify({
-        "message": "管理者と求職者を紐づけました",
-        "admin_job_seeker_id": new_link.admin_job_seeker_id
+        "message": f"{created_count}件の紐づけを登録しました"
     }), 201
-
 
 # 紐づけ解除
 @admin_job_seeker_bp.route(
@@ -127,7 +129,8 @@ def get_admin_job_seeker_links():
                 "admin_name": link.admin.name if link.admin else "",
                 "job_seeker_name": link.job_seeker.name if link.job_seeker else "",
                 "job_seeker_email": link.job_seeker.email if link.job_seeker else "",
-                "status": link.status
+                "status": link.status,
+                "admin_email": link.admin.email if link.admin else "",
             }
             for link in links
         ]
