@@ -13,7 +13,7 @@ function AdminJobSeekerLinkPage() {
   const [links, setLinks] = useState([]);
 
   const [selectedAdmin, setSelectedAdmin] = useState(null);
-  const [selectedJobSeeker, setSelectedJobSeeker] = useState(null);
+  const [selectedJobSeekers, setSelectedJobSeekers] = useState([]);
 
   const [adminKeyword, setAdminKeyword] = useState("");
   const [jobSeekerKeyword, setJobSeekerKeyword] = useState("");
@@ -96,8 +96,26 @@ function AdminJobSeekerLinkPage() {
     });
   }, [jobSeekers, jobSeekerKeyword]);
 
+  const toggleJobSeekerSelection = (jobSeeker) => {
+  setSelectedJobSeekers((prev) => {
+    const exists = prev.some(
+      (item) =>
+        item.job_seeker_id === jobSeeker.job_seeker_id
+    );
+
+    if (exists) {
+      return prev.filter(
+        (item) =>
+          item.job_seeker_id !== jobSeeker.job_seeker_id
+      );
+    }
+
+    return [...prev, jobSeeker];
+  });
+};
+
   const handleRegisterLink = async () => {
-    if (!selectedAdmin || !selectedJobSeeker) {
+    if (!selectedAdmin || selectedJobSeekers.length === 0) {
       setMessage("管理者と求職者を両方選択してください");
       return;
     }
@@ -112,9 +130,11 @@ function AdminJobSeekerLinkPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          admin_id: selectedAdmin.admin_id,
-          job_seeker_id: selectedJobSeeker.job_seeker_id,
-        }),
+            admin_id: selectedAdmin.admin_id,
+            job_seeker_ids: selectedJobSeekers.map(
+                (item) => item.job_seeker_id
+            ),
+}),
       });
 
       const data = await response.json();
@@ -126,7 +146,7 @@ function AdminJobSeekerLinkPage() {
       setMessage("管理者と求職者の紐づけが完了しました");
 
       setSelectedAdmin(null);
-      setSelectedJobSeeker(null);
+      setSelectedJobSeekers([]);
 
       await fetchInitialData();
     } catch (error) {
@@ -146,11 +166,11 @@ function AdminJobSeekerLinkPage() {
     );
   };
 
-  const selectedPairAlreadyLinked =
+  /* const selectedPairAlreadyLinked =
     selectedAdmin &&
     selectedJobSeeker &&
     isAlreadyLinked(selectedAdmin.admin_id, selectedJobSeeker.job_seeker_id);
-
+ */
   return (
     <div className="admin-jobseeker-link-page">
       <header className="link-page-header">
@@ -201,16 +221,16 @@ function AdminJobSeekerLinkPage() {
                   <p className="empty-text">管理者が見つかりません</p>
                 ) : (
                   filteredAdmins.map((admin) => (
-                    <button
-                      key={admin.admin_id}
-                      type="button"
-                      className={
-                        selectedAdmin?.admin_id === admin.admin_id
-                          ? "person-card selected"
-                          : "person-card"
-                      }
-                      onClick={() => setSelectedAdmin(admin)}
-                    >
+                  <button
+                  key={admin.admin_id}
+                  type="button"
+                  className={
+                    selectedAdmin?.admin_id === admin.admin_id
+                    ? "person-card selected"
+                    : "person-card"
+                }
+                onClick={() => setSelectedAdmin(admin)}
+                >
                       <div className="person-name">{admin.name}</div>
                       <div className="person-email">{admin.email}</div>
                       <div className="person-id">管理者ID: {admin.admin_id}</div>
@@ -243,12 +263,14 @@ function AdminJobSeekerLinkPage() {
                       key={jobSeeker.job_seeker_id}
                       type="button"
                       className={
-                        selectedJobSeeker?.job_seeker_id ===
-                        jobSeeker.job_seeker_id
+                        selectedJobSeekers.some(
+                            (item) =>
+                                item.job_seeker_id === jobSeeker.job_seeker_id
+                        )
                           ? "person-card selected"
                           : "person-card"
                       }
-                      onClick={() => setSelectedJobSeeker(jobSeeker)}
+                      onClick={() => toggleJobSeekerSelection(jobSeeker)}
                     >
                       <div className="person-name">{jobSeeker.name}</div>
                       <div className="person-email">{jobSeeker.email}</div>
@@ -282,32 +304,46 @@ function AdminJobSeekerLinkPage() {
 
               <div className="selected-person-box">
                 <span className="box-label">求職者</span>
-                {selectedJobSeeker ? (
-                  <>
-                    <strong>{selectedJobSeeker.name}</strong>
-                    <small>{selectedJobSeeker.email}</small>
-                  </>
-                ) : (
-                  <span className="not-selected">未選択</span>
-                )}
+                {selectedJobSeekers.length > 0 ? (
+                    <>
+                    {selectedJobSeekers.map((jobSeeker) => (
+                        <div
+                        key={jobSeeker.job_seeker_id}
+                        style={{ marginBottom: "8px" }}
+                        >
+                            <strong>{jobSeeker.name}</strong>
+                            <small
+                            style={{
+                                display: "block",
+                            }}
+                            >
+                                {jobSeeker.email}
+                                </small>
+                                </div>
+                            ))}
+  </>
+) : (
+  <span className="not-selected">
+    未選択
+  </span>
+)}
               </div>
             </div>
 
-            {selectedPairAlreadyLinked && (
+            {/* {selectedPairAlreadyLinked && (
               <div className="warning-message">
                 この管理者と求職者はすでに紐づけ済みです。
               </div>
-            )}
+            )} */}
 
             <button
               className="register-link-button"
               onClick={handleRegisterLink}
-              disabled={
+             disabled={
                 !selectedAdmin ||
-                !selectedJobSeeker ||
-                selectedPairAlreadyLinked ||
+                selectedJobSeekers.length === 0 ||
                 registering
-              }
+            }
             >
               {registering ? "登録中..." : "この内容で紐づけ登録"}
             </button>
