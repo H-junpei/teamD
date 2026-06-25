@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./JobSeekerRegister.css";
 
 function JobSeekerRegister() {
   const [name, setName] = useState("");
@@ -40,36 +41,50 @@ function JobSeekerRegister() {
   };
 
   return (
-    <div>
+  <div className="login-page">
+    <div className="login-card">
       <h1>求職者登録</h1>
 
-      <div>
+      <p className="sub-title">
+        面談スケジュール管理システム
+      </p>
+
+      <div className="input-group">
+        <label>氏名</label>
         <input
           type="text"
-          placeholder="名前"
+          placeholder="氏名を入力"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
 
-      <div>
+      <div className="input-group">
+        <label>メールアドレス</label>
         <input
           type="email"
-          placeholder="メールアドレス"
+          placeholder="example@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
-      <button onClick={handleRegister}>
-        登録
+      <button
+        className="jobseeker-register-btn"
+        onClick={handleRegister}
+      >
+        📝 新規登録
       </button>
 
-      <button onClick={() => navigate("/jobseeker")}>
-        戻る
+      <button
+        className="back-btn"
+        onClick={() => navigate("/jobseeker")}
+      >
+        ← 戻る
       </button>
     </div>
-  );
+  </div>
+);
 }
 
 export default JobSeekerRegister;

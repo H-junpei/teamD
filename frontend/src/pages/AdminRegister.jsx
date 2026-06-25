@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./AdminRegister.css";
 
 function AdminRegister() {
   const [name, setName] = useState("");
@@ -40,46 +41,61 @@ function AdminRegister() {
       alert("サーバーとの通信に失敗しました");
     }
   };
-
+  
   return (
-    <div>
+  <div className="login-page">
+    <div className="login-card">
       <h1>管理者登録</h1>
 
-      <div>
+      <p className="sub-title">
+        面談スケジュール管理システム
+      </p>
+
+      <div className="input-group">
+        <label>氏名</label>
         <input
           type="text"
-          placeholder="名前"
+          placeholder="氏名を入力"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
 
-      <div>
+      <div className="input-group">
+        <label>メールアドレス</label>
         <input
           type="email"
-          placeholder="メールアドレス"
+          placeholder="example@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
-      <div>
+      <div className="input-group">
+        <label>パスワード</label>
         <input
           type="password"
-          placeholder="パスワード"
+          placeholder="パスワードを入力"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
-      <button onClick={handleRegister}>
+      <button
+        className="register-btn"
+        onClick={handleRegister}
+      >
         登録
       </button>
 
-      <button onClick={() => navigate("/admin")}>
-        戻る
+      <button
+        className="back-btn"
+        onClick={() => navigate("/admin")}
+      >
+        ← 戻る
       </button>
     </div>
+  </div>
   );
 }
 
