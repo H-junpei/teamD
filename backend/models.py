@@ -64,6 +64,16 @@ class JobSeeker(db.Model):
   job_seeker_id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(20), nullable=False)
   email = db.Column(db.String(50), nullable=False)
+  status = db.Column(
+    db.String(50),
+    default="面談前"
+    )
+  memo = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+
   
   reservations = db.relationship("Reservation", backref="job_seeker")
 

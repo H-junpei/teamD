@@ -240,6 +240,13 @@ const handleCancelReservation = async (slotId) => {
         30分単位で空き時間を登録・削除できます。
         </p>
         <div className="admin-header-actions">
+            
+            {/* <button
+            onClick={() => navigate("/admin/status")}
+            >
+                求職者ステータス管理
+            </button> */}
+
             <button
             className="link-manage-button"
             onClick={() => navigate("/admin/job-seeker-links")}

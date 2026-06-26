@@ -10,6 +10,7 @@ import AdminJobSeekerRomove from "./pages/AdminJobSeekerRomove"
 import JobSeekerRegister from "./pages/JobSeekerRegister";
 import JobSeekerSelect from "./pages/JobSeekerSelect";
 import JobSeekerLogin from "./pages/JobSeekerLogin";
+import StatusManagementPage from "./pages/StatusManagementPage";
 
 function App() {
   return (
@@ -25,10 +26,8 @@ function App() {
         <Route path="/jobseeker/register" element={<JobSeekerRegister />} />
         <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
         <Route path="/reservation" element={<Reservation />} />
-        <Route
-          path="/admin/job-seeker-links"
-          element={<AdminJobSeekerLinkPage />}
-        />
+        <Route path="/admin/job-seeker-links" element={<AdminJobSeekerLinkPage />}/>
+        <Route path="/admin/status" element={<StatusManagementPage />}/>
 
       </Routes>
     </BrowserRouter>
