@@ -25,7 +25,8 @@
   font-size: 14px;
 }
 
-.reload-button {
+.reload-button,
+.change-remove-button {
   padding: 10px 16px;
   border: none;
   border-radius: 10px;
