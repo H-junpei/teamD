@@ -18,6 +18,7 @@ from routes.admin import admin_slots_bp
 from routes.auth import auth_bp
 from routes.admin_routes import admin_bp
 from routes.admin_job_seeker import admin_job_seeker_bp
+from routes.job_seeker_status import job_seeker_status_bp
 
 def create_app():
     load_dotenv()
@@ -51,6 +52,7 @@ def create_app():
     app.register_blueprint(admin_slots_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_job_seeker_bp)
+    app.register_blueprint(job_seeker_status_bp)
 
 
     with app.app_context():
