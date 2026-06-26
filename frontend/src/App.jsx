@@ -6,7 +6,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminPage from "./pages/AdminPage";
 import Reservation from "./pages/reservation";
 import AdminJobSeekerLinkPage from "./pages/AdminJobSeekerLinkPage";
-import AdminJobSeekerRomove from "./pages/AdminJobSeekerRomove"
+import AdminJobSeekerRemove from "./pages/AdminJobSeekerRemove"
 import JobSeekerRegister from "./pages/JobSeekerRegister";
 import JobSeekerSelect from "./pages/JobSeekerSelect";
 import JobSeekerLogin from "./pages/JobSeekerLogin";
@@ -21,13 +21,13 @@ function App() {
         <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/page" element={<AdminPage />} />
-        <Route path="/admin/job-seeker-remove" element={<AdminJobSeekerRomove />} />
+        <Route path="/admin/job-seeker-remove" element={<AdminJobSeekerRemove />} />
         <Route path="/jobseeker" element={<JobSeekerSelect />} />
         <Route path="/jobseeker/register" element={<JobSeekerRegister />} />
         <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
         <Route path="/reservation" element={<Reservation />} />
-        <Route path="/admin/job-seeker-links" element={<AdminJobSeekerLinkPage />}/>
-        <Route path="/admin/status" element={<StatusManagementPage />}/>
+        <Route path="/admin/job-seeker-links" element={<AdminJobSeekerLinkPage />} />
+        <Route path="/admin/status" element={<StatusManagementPage />} />
 
       </Routes>
     </BrowserRouter>
