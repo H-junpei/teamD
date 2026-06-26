@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash
 
 from extensions import db
-from models import Admin, JobSeeker
+from models import Admin, JobSeeker, AdminJobSeeker
 
 # Blueprintを作る
 admin_bp = Blueprint("admin", __name__)
@@ -63,6 +63,8 @@ def delete_job_seeker(id):
     if not job_seeker:
         return jsonify({"error": "Not found"}), 404
 
+    AdminJobSeeker.query.filter_by(job_seeker_id=id).delete()
+    
     db.session.delete(job_seeker)
     db.session.commit()
 
