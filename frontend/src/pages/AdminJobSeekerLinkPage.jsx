@@ -97,22 +97,22 @@ function AdminJobSeekerLinkPage() {
   }, [jobSeekers, jobSeekerKeyword]);
 
   const toggleJobSeekerSelection = (jobSeeker) => {
-  setSelectedJobSeekers((prev) => {
-    const exists = prev.some(
-      (item) =>
-        item.job_seeker_id === jobSeeker.job_seeker_id
-    );
-
-    if (exists) {
-      return prev.filter(
+    setSelectedJobSeekers((prev) => {
+      const exists = prev.some(
         (item) =>
-          item.job_seeker_id !== jobSeeker.job_seeker_id
+          item.job_seeker_id === jobSeeker.job_seeker_id
       );
-    }
 
-    return [...prev, jobSeeker];
-  });
-};
+      if (exists) {
+        return prev.filter(
+          (item) =>
+            item.job_seeker_id !== jobSeeker.job_seeker_id
+        );
+      }
+
+      return [...prev, jobSeeker];
+    });
+  };
 
   const handleRegisterLink = async () => {
     if (!selectedAdmin || selectedJobSeekers.length === 0) {
@@ -130,11 +130,11 @@ function AdminJobSeekerLinkPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            admin_id: selectedAdmin.admin_id,
-            job_seeker_ids: selectedJobSeekers.map(
-                (item) => item.job_seeker_id
-            ),
-}),
+          admin_id: selectedAdmin.admin_id,
+          job_seeker_ids: selectedJobSeekers.map(
+            (item) => item.job_seeker_id
+          ),
+        }),
       });
 
       const data = await response.json();
@@ -175,20 +175,24 @@ function AdminJobSeekerLinkPage() {
     <div className="admin-jobseeker-link-page">
       <header className="link-page-header">
         <div>
-            <button
+          <button
             type="button"
             className="back-admin-button"
             onClick={() => navigate("/admin/page")}
-            >
-                <span className="back-icon">←</span>
-                管理者画面に戻る
-                </button>
+          >
+            <span className="back-icon">←</span>
+            管理者画面に戻る
+          </button>
 
           <h1>管理者・求職者 紐づけ登録</h1>
           <p>
             登録済みの管理者と求職者をクリックで選択し、担当関係を登録します。
           </p>
         </div>
+
+        <button className="change-remove-button" onClick={() => navigate("/admin/job-seeker-remove")}>
+          求職者削除画面へ
+        </button>
 
         <button className="reload-button" onClick={fetchInitialData}>
           再読み込み
@@ -221,16 +225,16 @@ function AdminJobSeekerLinkPage() {
                   <p className="empty-text">管理者が見つかりません</p>
                 ) : (
                   filteredAdmins.map((admin) => (
-                  <button
-                  key={admin.admin_id}
-                  type="button"
-                  className={
-                    selectedAdmin?.admin_id === admin.admin_id
-                    ? "person-card selected"
-                    : "person-card"
-                }
-                onClick={() => setSelectedAdmin(admin)}
-                >
+                    <button
+                      key={admin.admin_id}
+                      type="button"
+                      className={
+                        selectedAdmin?.admin_id === admin.admin_id
+                          ? "person-card selected"
+                          : "person-card"
+                      }
+                      onClick={() => setSelectedAdmin(admin)}
+                    >
                       <div className="person-name">{admin.name}</div>
                       <div className="person-email">{admin.email}</div>
                       <div className="person-id">管理者ID: {admin.admin_id}</div>
@@ -264,8 +268,8 @@ function AdminJobSeekerLinkPage() {
                       type="button"
                       className={
                         selectedJobSeekers.some(
-                            (item) =>
-                                item.job_seeker_id === jobSeeker.job_seeker_id
+                          (item) =>
+                            item.job_seeker_id === jobSeeker.job_seeker_id
                         )
                           ? "person-card selected"
                           : "person-card"
@@ -305,28 +309,28 @@ function AdminJobSeekerLinkPage() {
               <div className="selected-person-box">
                 <span className="box-label">求職者</span>
                 {selectedJobSeekers.length > 0 ? (
-                    <>
+                  <>
                     {selectedJobSeekers.map((jobSeeker) => (
-                        <div
+                      <div
                         key={jobSeeker.job_seeker_id}
                         style={{ marginBottom: "8px" }}
+                      >
+                        <strong>{jobSeeker.name}</strong>
+                        <small
+                          style={{
+                            display: "block",
+                          }}
                         >
-                            <strong>{jobSeeker.name}</strong>
-                            <small
-                            style={{
-                                display: "block",
-                            }}
-                            >
-                                {jobSeeker.email}
-                                </small>
-                                </div>
-                            ))}
-  </>
-) : (
-  <span className="not-selected">
-    未選択
-  </span>
-)}
+                          {jobSeeker.email}
+                        </small>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <span className="not-selected">
+                    未選択
+                  </span>
+                )}
               </div>
             </div>
 
@@ -339,11 +343,11 @@ function AdminJobSeekerLinkPage() {
             <button
               className="register-link-button"
               onClick={handleRegisterLink}
-             disabled={
+              disabled={
                 !selectedAdmin ||
                 selectedJobSeekers.length === 0 ||
                 registering
-            }
+              }
             >
               {registering ? "登録中..." : "この内容で紐づけ登録"}
             </button>
